@@ -1,19 +1,23 @@
+<?php
 require_once 'config/database.php';
 require_once 'includes/auth.php';
 require_once 'classes/User.php';
 
+// Initialize variables
+$error_message = "";
+
+// Redirect if already logged in
 if (isLoggedIn()) {
     header("Location: dashboard.php");
     exit();
 }
 
-$error_message = "";
-
-if ($_POST) {
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $database = new Database();
     $db = $database->getConnection();
     $user = new User($db);
-
+    
     $user->email = $_POST['email'];
     $password = $_POST['password'];
 
@@ -39,20 +43,20 @@ if ($_POST) {
     <title>Login - Lens Rental</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="bg-light">
-    <div class="container">
+<body>
+    <div class="container mt-5">
         <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-4">
-                <div class="card mt-5">
+            <div class="col-md-6">
+                <div class="card">
                     <div class="card-header">
                         <h3 class="text-center">Login</h3>
                     </div>
                     <div class="card-body">
                         <?php if ($error_message): ?>
-                            <div class="alert alert-danger"><?php echo $error_message; ?></div>
+                            <div class="alert alert-danger"><?php echo htmlspecialchars($error_message); ?></div>
                         <?php endif; ?>
-                        
-                        <form method="post">
+
+                        <form method="POST" action="">
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
                                 <input type="email" class="form-control" id="email" name="email" required>
@@ -61,18 +65,19 @@ if ($_POST) {
                                 <label for="password" class="form-label">Password</label>
                                 <input type="password" class="form-control" id="password" name="password" required>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100">Login</button>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Login</button>
+                            </div>
                         </form>
-                        
                         <div class="text-center mt-3">
-                            <p>Belum punya akun? <a href="register.php">Daftar di sini</a></p>
-                            <a href="index.php" class="btn btn-link">Kembali ke Beranda</a>
+                            <p>Belum punya akun? <a href="register.php">Register di sini</a></p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 
