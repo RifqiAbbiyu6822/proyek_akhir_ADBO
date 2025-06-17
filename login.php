@@ -1,95 +1,141 @@
 <?php
-require_once 'config/database.php';
 require_once 'includes/auth.php';
-require_once 'classes/User.php';
 
-// Initialize variables
-$error_message = "";
-
-// Redirect if already logged in
+// If user is already logged in, redirect to dashboard
 if (isLoggedIn()) {
     header("Location: dashboard.php");
     exit();
 }
 
-// Handle form submission
+$error = '';
+$email = '';
+
+// Check for timeout message
+if (isset($_GET['timeout'])) {
+    $error = 'Your session has expired. Please login again.';
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
-        $error_message = "Invalid request";
+    $email = $_POST['email'] ?? '';
+    $password = $_POST['password'] ?? '';
+    
+    if (empty($email) || empty($password)) {
+        $error = 'Please fill in all fields';
     } else {
+        require_once 'config/database.php';
+        
         try {
             $database = new Database();
             $db = $database->getConnection();
-            $user = new User($db);
             
-            $user->email = $_POST['email'] ?? '';
-            $password = $_POST['password'] ?? '';
-
-            if ($user->login($password)) {
-                $_SESSION['user_id'] = $user->id;
-                $_SESSION['user_name'] = $user->name;
+            $query = "SELECT id, name, email, password FROM users WHERE email = ?";
+            $stmt = $db->prepare($query);
+            $stmt->execute([$email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($user && password_verify($password, $user['password'])) {
+                // Set session variables
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_name'] = $user['name'];
+                $_SESSION['last_activity'] = time();
+                $_SESSION['last_regeneration'] = time();
                 
-                // Redirect to the page user was trying to access, or dashboard
+                // Redirect to dashboard or saved URL
                 $redirect = $_SESSION['redirect_after_login'] ?? 'dashboard.php';
                 unset($_SESSION['redirect_after_login']);
-                
                 header("Location: " . $redirect);
                 exit();
             } else {
-                $error_message = "Email atau password salah!";
+                $error = 'Invalid email or password';
             }
         } catch (Exception $e) {
-            $error_message = $e->getMessage();
+            error_log("Login error: " . $e->getMessage());
+            $error = 'An error occurred. Please try again later.';
         }
     }
 }
-
-$csrf_token = generateCSRFToken();
 ?>
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Lens Rental</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Login - Lens Rental System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            background-color: #fff;
+            border-bottom: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .form-control {
+            border-radius: 5px;
+            padding: 10px 15px;
+        }
+        .btn-primary {
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .alert {
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="text-center">Login</h3>
-                    </div>
-                    <div class="card-body">
-                        <?php if ($error_message): ?>
-                            <div class="alert alert-danger"><?php echo htmlspecialchars($error_message); ?></div>
-                        <?php endif; ?>
-
-                        <form method="POST" action="">
-                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" required>
-                            </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">Login</button>
-                            </div>
-                        </form>
-                        <div class="text-center mt-3">
-                            <p>Belum punya akun? <a href="register.php">Register di sini</a></p>
+    <div class="container">
+        <div class="login-container">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Login</h4>
+                </div>
+                <div class="card-body">
+                    <?php if ($error): ?>
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <?php echo htmlspecialchars($error); ?>
                         </div>
+                    <?php endif; ?>
+                    
+                    <form method="POST" action="">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="<?php echo htmlspecialchars($email); ?>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="text-center mt-3">
+                        <p class="mb-0">Don't have an account? <a href="register.php">Register here</a></p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 
