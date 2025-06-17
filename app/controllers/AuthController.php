@@ -78,4 +78,65 @@ class AuthController extends Controller {
             $this->redirect('auth');
         }
     }
+
+    public function register() {
+        try {
+            if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                $validator = new Validator($_POST);
+                $rules = [
+                    'name' => 'required|min:3',
+                    'email' => 'required|email',
+                    'password' => 'required|min:6',
+                    'confirm_password' => 'required|min:6'
+                ];
+
+                $isValid = $validator->validate($rules);
+                $errors = $validator->getErrors();
+
+                // Cek konfirmasi password
+                if ($_POST['password'] !== $_POST['confirm_password']) {
+                    $errors['confirm_password'][] = 'Konfirmasi password tidak cocok';
+                    $isValid = false;
+                }
+
+                // Cek email sudah terdaftar
+                if ($this->userModel->findUserByEmail($_POST['email'])) {
+                    $errors['email'][] = 'Email sudah terdaftar';
+                    $isValid = false;
+                }
+
+                if ($isValid) {
+                    $data = [
+                        'name' => $_POST['name'],
+                        'email' => $_POST['email'],
+                        'password' => $_POST['password']
+                    ];
+                    if ($this->userModel->register($data)) {
+                        // Log registrasi
+                        error_log("User {$data['email']} registered successfully at " . date('Y-m-d H:i:s'));
+                        $this->redirect('auth/login');
+                    } else {
+                        $this->view('auth/register', [
+                            'error' => 'Gagal mendaftar, silakan coba lagi',
+                            'name' => $_POST['name'],
+                            'email' => $_POST['email']
+                        ]);
+                    }
+                } else {
+                    $this->view('auth/register', [
+                        'errors' => $errors,
+                        'name' => $_POST['name'],
+                        'email' => $_POST['email']
+                    ]);
+                }
+            } else {
+                $this->view('auth/register');
+            }
+        } catch (Exception $e) {
+            error_log("Register error: " . $e->getMessage());
+            $this->view('auth/register', [
+                'error' => 'Terjadi kesalahan saat registrasi. Silakan coba lagi.'
+            ]);
+        }
+    }
 } 

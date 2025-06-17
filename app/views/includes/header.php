@@ -3,43 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lens Rental System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Lensa Rental - <?= isset(
+        $title) ? $title : 'Home' ?></title>
+    <!-- Vintage CSS Theme -->
+    <link rel="stylesheet" href="<?php echo BASEURL; ?>/public/css/style.css?v=2">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="<?php echo BASEURL; ?>">Lens Rental</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <?php if(isset($_SESSION['user_id'])): ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?php echo BASEURL; ?>/rental">Rent Lens</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?php echo BASEURL; ?>/return">Return Lens</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?php echo BASEURL; ?>/history">Rental History</a>
-                        </li>
-                    <?php endif; ?>
-                </ul>
-                <ul class="navbar-nav">
-                    <?php if(isset($_SESSION['user_id'])): ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?php echo BASEURL; ?>/auth/logout">Logout</a>
-                        </li>
-                    <?php else: ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?php echo BASEURL; ?>/auth">Login</a>
-                        </li>
-                    <?php endif; ?>
-                </ul>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <a href="<?php echo BASEURL; ?>/" class="navbar-brand">
+                <i class="fas fa-camera"></i> Lensa Rental
+            </a>
+            <ul class="navbar-nav">
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <li><a href="<?php echo BASEURL; ?>/rental" class="nav-link"><i class="fas fa-lens"></i> Rental Lensa</a></li>
+                    <li><a href="<?php echo BASEURL; ?>/return" class="nav-link"><i class="fas fa-undo"></i> Kembalikan</a></li>
+                    <li><a href="<?php echo BASEURL; ?>/history" class="nav-link"><i class="fas fa-history"></i> Riwayat</a></li>
+                    <li><a href="<?php echo BASEURL; ?>/auth/logout" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <?php else: ?>
+                    <li><a href="<?php echo BASEURL; ?>/auth/login" class="nav-link"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                    <li><a href="<?php echo BASEURL; ?>/auth/register" class="nav-link"><i class="fas fa-user-plus"></i> Register</a></li>
+                <?php endif; ?>
+            </ul>
+        </nav>
+    </header>
+    <main class="container">
+        <?php if (isset($_SESSION['flash_message'])): ?>
+            <div class="alert alert-<?= $_SESSION['flash_type'] ?? 'info' ?>">
+                <?= $_SESSION['flash_message'] ?>
             </div>
-        </div>
-    </nav>
-    <div class="container mt-4"> 
+            <?php unset($_SESSION['flash_message'], $_SESSION['flash_type']); ?>
+        <?php endif; ?>
+    </main> 

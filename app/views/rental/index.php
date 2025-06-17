@@ -1,3 +1,4 @@
+<?php require_once APPROOT . '/views/includes/header.php'; ?>
 <div class="row">
     <div class="card">
         <h2 style="margin-bottom: 1.5rem;">Daftar Lensa Tersedia</h2>
@@ -25,4 +26,5 @@
             <?php endforeach; ?>
         </div>
     </div>
-</div> 
+</div>
+<?php require_once APPROOT . '/views/includes/footer.php'; ?> 

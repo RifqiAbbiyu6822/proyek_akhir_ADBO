@@ -15,7 +15,7 @@
             <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
         </form>
         <p style="text-align: center; margin-top: 1rem;">
-            Belum punya akun? <a href="/auth/register" style="color: var(--primary-color);">Register</a>
+            Belum punya akun? <a href="<?php echo BASEURL; ?>/auth/register" style="color: var(--primary-color);">Register</a>
         </p>
     </div>
 </div>

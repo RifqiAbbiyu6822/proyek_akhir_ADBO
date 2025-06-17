@@ -1,9 +1,8 @@
-    </div>
-    <footer class="bg-dark text-light mt-5 py-3">
-        <div class="container text-center">
-            <p class="mb-0">&copy; <?php echo date('Y'); ?> Lens Rental System. All rights reserved.</p>
-        </div>
-    </footer>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+        </main>
+        <footer style="background: var(--vintage-primary); color: var(--vintage-light); padding: 2rem 0; text-align: center; margin-top: 3rem;">
+            <div>
+                <p style="margin: 0;">&copy; <?php echo date('Y'); ?> Lensa Rental. All rights reserved.</p>
+            </div>
+        </footer>
+    </body>
 </html> 

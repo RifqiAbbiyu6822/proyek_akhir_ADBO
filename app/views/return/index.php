@@ -1,3 +1,4 @@
+<?php require_once APPROOT . '/views/includes/header.php'; ?>
 <div class="row">
     <div class="card">
         <h2 style="margin-bottom: 1.5rem;">Daftar Lensa yang Dirental</h2>
@@ -41,4 +42,5 @@
             </table>
         </div>
     </div>
-</div> 
+</div>
+<?php require_once APPROOT . '/views/includes/footer.php'; ?> 
