@@ -1,3 +1,4 @@
+<?php
 session_start();
 
 function isLoggedIn() {
@@ -14,12 +15,14 @@ function requireLogin() {
 function getCurrentUser() {
     if (!isLoggedIn()) return null;
     
+    require_once __DIR__ . '/../config/database.php';
+    
     $database = new Database();
     $db = $database->getConnection();
     
     $query = "SELECT * FROM users WHERE id = ?";
     $stmt = $db->prepare($query);
     $stmt->execute([$_SESSION['user_id']]);
-    
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
+?>

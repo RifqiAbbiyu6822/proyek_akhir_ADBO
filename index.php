@@ -1,3 +1,8 @@
+<?php
+require_once 'config/database.php';
+require_once 'classes/Lens.php';
+require_once 'includes/auth.php';
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -22,10 +27,6 @@
 </head>
 <body>
     <?php
-    require_once 'config/database.php';
-    require_once 'includes/auth.php';
-    require_once 'classes/Lens.php';
-    
     $database = new Database();
     $db = $database->getConnection();
     $lens = new Lens($db);

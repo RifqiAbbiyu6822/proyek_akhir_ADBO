@@ -1,3 +1,4 @@
+<?php
 class Lens {
     private $conn;
     private $table_name = "lenses";
@@ -34,3 +35,4 @@ class Lens {
         return $stmt->execute([$status, $id]);
     }
 }
+?>
