@@ -1,16 +1,24 @@
+<?php
 require_once 'config/database.php';
 require_once 'includes/auth.php';
 require_once 'classes/Rental.php';
 require_once 'classes/Fine.php';
 
+// Ensure user is logged in
 requireLogin();
 
+// Initialize database connection
 $database = new Database();
 $db = $database->getConnection();
+
+// Initialize objects
 $rental = new Rental($db);
 $fine = new Fine($db);
 
+// Get current user data
 $user = getCurrentUser();
+
+// Get user's rentals and fines
 $user_rentals = $rental->getUserRentals($_SESSION['user_id']);
 $user_fines = $fine->getUserFines($_SESSION['user_id']);
 ?>
@@ -23,13 +31,26 @@ $user_fines = $fine->getUserFines($_SESSION['user_id']);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="index.php">LensRental</a>
-            <div class="navbar-nav ms-auto">
-                <span class="navbar-text me-3">Halo, <?php echo htmlspecialchars($user['name']); ?>!</span>
-                <a class="nav-link" href="index.php">Beranda</a>
-                <a class="nav-link" href="logout.php">Logout</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.php">Beranda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="dashboard.php">Dashboard</a>
+                    </li>
+                </ul>
+                <div class="navbar-nav">
+                    <span class="nav-link">Halo, <?php echo htmlspecialchars($user['name']); ?>!</span>
+                    <a class="nav-link" href="logout.php">Logout</a>
+                </div>
             </div>
         </div>
     </nav>
@@ -37,13 +58,13 @@ $user_fines = $fine->getUserFines($_SESSION['user_id']);
     <div class="container mt-4">
         <h2>Dashboard</h2>
         
-        <!-- Rental History -->
+        <!-- Active Rentals -->
         <div class="card mb-4">
             <div class="card-header">
-                <h5>Riwayat Penyewaan</h5>
+                <h4>Penyewaan Aktif</h4>
             </div>
             <div class="card-body">
-                <?php if ($user_rentals->rowCount() > 0): ?>
+                <?php if ($user_rentals && $user_rentals->rowCount() > 0): ?>
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
@@ -52,29 +73,22 @@ $user_fines = $fine->getUserFines($_SESSION['user_id']);
                                     <th>Tanggal Sewa</th>
                                     <th>Tanggal Kembali</th>
                                     <th>Status</th>
-                                    <th>Harga/hari</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php while ($row = $user_rentals->fetch(PDO::FETCH_ASSOC)): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($row['lens_name']); ?></td>
-                                    <td><?php echo date('d/m/Y', strtotime($row['rental_date'])); ?></td>
-                                    <td><?php echo date('d/m/Y', strtotime($row['return_date'])); ?></td>
-                                    <td>
-                                        <span class="badge <?php echo $row['status'] == 'active' ? 'bg-warning' : 'bg-success'; ?>">
-                                            <?php echo $row['status'] == 'active' ? 'Aktif' : 'Dikembalikan'; ?>
-                                        </span>
-                                    </td>
-                                    <td>Rp <?php echo number_format($row['price_per_day'], 0, ',', '.'); ?></td>
-                                </tr>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($row['lens_name']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['rent_date']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['return_date']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['status']); ?></td>
+                                    </tr>
                                 <?php endwhile; ?>
                             </tbody>
                         </table>
                     </div>
                 <?php else: ?>
-                    <p>Belum ada riwayat penyewaan.</p>
-                    <a href="index.php" class="btn btn-primary">Mulai Sewa Lensa</a>
+                    <p class="text-muted">Tidak ada penyewaan aktif.</p>
                 <?php endif; ?>
             </div>
         </div>
@@ -82,41 +96,32 @@ $user_fines = $fine->getUserFines($_SESSION['user_id']);
         <!-- Fines -->
         <div class="card">
             <div class="card-header">
-                <h5>Denda</h5>
+                <h4>Denda</h4>
             </div>
             <div class="card-body">
-                <?php if ($user_fines->rowCount() > 0): ?>
+                <?php if ($user_fines && $user_fines->rowCount() > 0): ?>
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>Lensa</th>
-                                    <th>Periode Sewa</th>
-                                    <th>Jumlah Denda</th>
+                                    <th>Tanggal</th>
+                                    <th>Jumlah</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php while ($row = $user_fines->fetch(PDO::FETCH_ASSOC)): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($row['lens_name']); ?></td>
-                                    <td>
-                                        <?php echo date('d/m/Y', strtotime($row['rental_date'])); ?> - 
-                                        <?php echo date('d/m/Y', strtotime($row['return_date'])); ?>
-                                    </td>
-                                    <td>Rp <?php echo number_format($row['amount'], 0, ',', '.'); ?></td>
-                                    <td>
-                                        <span class="badge <?php echo $row['status'] == 'pending' ? 'bg-danger' : 'bg-success'; ?>">
-                                            <?php echo $row['status'] == 'pending' ? 'Belum Dibayar' : 'Lunas'; ?>
-                                        </span>
-                                    </td>
-                                </tr>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($row['date']); ?></td>
+                                        <td>Rp <?php echo number_format($row['amount'], 0, ',', '.'); ?></td>
+                                        <td><?php echo htmlspecialchars($row['status']); ?></td>
+                                    </tr>
                                 <?php endwhile; ?>
                             </tbody>
                         </table>
                     </div>
                 <?php else: ?>
-                    <p>Tidak ada denda.</p>
+                    <p class="text-muted">Tidak ada denda.</p>
                 <?php endif; ?>
             </div>
         </div>
