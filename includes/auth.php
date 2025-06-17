@@ -1,12 +1,13 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Set secure session parameters
+// Set secure session parameters before starting the session
 ini_set('session.cookie_httponly', 1);
 ini_set('session.use_only_cookies', 1);
 ini_set('session.cookie_secure', isset($_SERVER['HTTPS']));
+
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 function isLoggedIn() {
     return isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
@@ -49,4 +50,27 @@ function generateCSRFToken() {
 function validateCSRFToken($token) {
     return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
 }
+
+// Set session security parameters
+function setSessionSecurity() {
+    // Regenerate session ID periodically
+    if (!isset($_SESSION['last_regeneration']) || 
+        time() - $_SESSION['last_regeneration'] > 1800) { // 30 minutes
+        session_regenerate_id(true);
+        $_SESSION['last_regeneration'] = time();
+    }
+
+    // Set session timeout
+    if (isset($_SESSION['last_activity']) && 
+        time() - $_SESSION['last_activity'] > 1800) { // 30 minutes
+        session_unset();
+        session_destroy();
+        header("Location: login.php?timeout=1");
+        exit();
+    }
+    $_SESSION['last_activity'] = time();
+}
+
+// Call session security function
+setSessionSecurity();
 ?>
