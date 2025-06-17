@@ -14,26 +14,37 @@ if (isLoggedIn()) {
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $database = new Database();
-    $db = $database->getConnection();
-    $user = new User($db);
-    
-    $user->email = $_POST['email'];
-    $password = $_POST['password'];
-
-    if ($user->emailExists()) {
-        if (password_verify($password, $user->password)) {
-            $_SESSION['user_id'] = $user->id;
-            $_SESSION['user_name'] = $user->name;
-            header("Location: dashboard.php");
-            exit();
-        } else {
-            $error_message = "Password salah!";
-        }
+    if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
+        $error_message = "Invalid request";
     } else {
-        $error_message = "Email tidak ditemukan!";
+        try {
+            $database = new Database();
+            $db = $database->getConnection();
+            $user = new User($db);
+            
+            $user->email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? '';
+
+            if ($user->login($password)) {
+                $_SESSION['user_id'] = $user->id;
+                $_SESSION['user_name'] = $user->name;
+                
+                // Redirect to the page user was trying to access, or dashboard
+                $redirect = $_SESSION['redirect_after_login'] ?? 'dashboard.php';
+                unset($_SESSION['redirect_after_login']);
+                
+                header("Location: " . $redirect);
+                exit();
+            } else {
+                $error_message = "Email atau password salah!";
+            }
+        } catch (Exception $e) {
+            $error_message = $e->getMessage();
+        }
     }
 }
+
+$csrf_token = generateCSRFToken();
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -57,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php endif; ?>
 
                         <form method="POST" action="">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
                                 <input type="email" class="form-control" id="email" name="email" required>

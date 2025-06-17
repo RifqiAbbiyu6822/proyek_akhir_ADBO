@@ -15,29 +15,33 @@ if (isLoggedIn()) {
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $database = new Database();
-    $db = $database->getConnection();
-    $user = new User($db);
-    
-    $user->name = $_POST['name'];
-    $user->email = $_POST['email'];
-    $user->password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
-
-    if ($user->password !== $confirm_password) {
-        $error_message = "Password tidak cocok!";
+    if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
+        $error_message = "Invalid request";
     } else {
-        if ($user->emailExists()) {
-            $error_message = "Email sudah terdaftar!";
-        } else {
-            if ($user->register()) {
-                $success_message = "Registrasi berhasil! Silakan login.";
+        try {
+            $database = new Database();
+            $db = $database->getConnection();
+            $user = new User($db);
+            
+            $user->name = $_POST['name'] ?? '';
+            $user->email = $_POST['email'] ?? '';
+            $user->password = $_POST['password'] ?? '';
+            $confirm_password = $_POST['confirm_password'] ?? '';
+
+            if ($user->password !== $confirm_password) {
+                $error_message = "Password tidak cocok!";
             } else {
-                $error_message = "Terjadi kesalahan. Silakan coba lagi.";
+                if ($user->register()) {
+                    $success_message = "Registrasi berhasil! Silakan login.";
+                }
             }
+        } catch (Exception $e) {
+            $error_message = $e->getMessage();
         }
     }
 }
+
+$csrf_token = generateCSRFToken();
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -65,9 +69,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php endif; ?>
 
                         <form method="POST" action="">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
                             <div class="mb-3">
                                 <label for="name" class="form-label">Nama</label>
-                                <input type="text" class="form-control" id="name" name="name" required>
+                                <input type="text" class="form-control" id="name" name="name" required minlength="2">
+                                <div class="form-text">Minimal 2 karakter</div>
                             </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
@@ -75,11 +81,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" required>
+                                <input type="password" class="form-control" id="password" name="password" required minlength="8">
+                                <div class="form-text">Minimal 8 karakter, harus mengandung angka dan huruf</div>
                             </div>
                             <div class="mb-3">
                                 <label for="confirm_password" class="form-label">Konfirmasi Password</label>
-                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required minlength="8">
                             </div>
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-primary">Register</button>
