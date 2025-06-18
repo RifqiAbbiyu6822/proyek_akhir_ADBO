@@ -40,6 +40,9 @@ require_once 'includes/auth.php';
             <div class="navbar-nav ms-auto">
                 <?php if (isLoggedIn()): ?>
                     <a class="nav-link" href="dashboard.php">Dashboard</a>
+                    <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 4): ?>
+                        <a class="nav-link" href="admin/index.php">Admin Panel</a>
+                    <?php endif; ?>
                     <a class="nav-link" href="logout.php">Logout</a>
                 <?php else: ?>
                     <a class="nav-link" href="login.php">Login</a>

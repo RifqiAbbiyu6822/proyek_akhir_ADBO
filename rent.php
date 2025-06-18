@@ -106,6 +106,11 @@ $csrf_token = generateCSRFToken();
                     <li class="nav-item">
                         <a class="nav-link" href="dashboard.php">Dashboard</a>
                     </li>
+                    <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 4): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin/index.php">Admin Panel</a>
+                    </li>
+                    <?php endif; ?>
                 </ul>
                 <div class="navbar-nav">
                     <a class="nav-link" href="logout.php">Logout</a>

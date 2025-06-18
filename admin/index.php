@@ -5,7 +5,7 @@ require_once '../classes/Fine.php';
 require_once '../classes/Lens.php';
 
 // Simple admin check - in real application, you'd have proper admin roles
-if (!isLoggedIn() || $_SESSION['user_id'] != 1) {
+if (!isLoggedIn() || $_SESSION['user_id'] != 4) {
     header("Location: ../login.php");
     exit();
 }
