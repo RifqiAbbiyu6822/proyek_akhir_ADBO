@@ -28,8 +28,7 @@ if (isset($_POST['create_fine'])) {
     $rental_id = $_POST['rental_id'];
     $fine_days = isset($_POST['fine_days']) ? (int)$_POST['fine_days'] : 0;
     if ($fine_days < 1) $fine_days = 0;
-    $amount = isset($_POST['fine_amount']) ? (int)$_POST['fine_amount'] : 0;
-    if ($amount < 0) $amount = 0;
+    $amount = 0;
     $damage_type = isset($_POST['damage_type']) ? $_POST['damage_type'] : 'none';
     $description = "Denda keterlambatan";
     if ($damage_type !== 'none') {
