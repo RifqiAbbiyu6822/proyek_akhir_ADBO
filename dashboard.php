@@ -121,7 +121,7 @@ try {
                                     <?php while ($row = $user_rentals->fetch(PDO::FETCH_ASSOC)): ?>
                                         <tr>
                                             <td><?php echo htmlspecialchars($row['lens_name']); ?></td>
-                                            <td><?php echo date('d/m/Y', strtotime($row['rent_date'])); ?></td>
+                                            <td><?php echo date('d/m/Y', strtotime($row['rental_date'])); ?></td>
                                             <td><?php echo date('d/m/Y', strtotime($row['return_date'])); ?></td>
                                             <td>
                                                 <span class="badge bg-<?php echo $row['status'] === 'active' ? 'success' : 'secondary'; ?>">
