@@ -160,12 +160,14 @@ if (isset($_POST['return_lens'])) {
                                                         <div class="modal-body">
                                                             <p>Buat denda untuk <strong><?php echo htmlspecialchars($row['user_name']); ?></strong></p>
                                                             <div class="mb-3">
+                                                                <label for="fine_days_<?php echo $row['id']; ?>" class="form-label">Hari Keterlambatan</label>
+                                                                <input type="number" class="form-control" name="fine_days" id="fine_days_<?php echo $row['id']; ?>" value="<?php echo $days_overdue; ?>" min="1" required>
+                                                            </div>
+                                                            <div class="mb-3">
                                                                 <label for="fine_amount" class="form-label">Jumlah Denda (Rp)</label>
-                                                                <input type="number" class="form-control" name="fine_amount" 
-                                                                       value="<?php echo $days_overdue * 10000; ?>" required>
+                                                                <input type="number" class="form-control" name="fine_amount" value="<?php echo $days_overdue * 10000; ?>" required>
                                                                 <small class="form-text text-muted">
-                                                                    Saran: Rp <?php echo number_format($days_overdue * 10000, 0, ',', '.'); ?> 
-                                                                    (<?php echo $days_overdue; ?> hari × Rp 10.000)
+                                                                    Saran: Rp <?php echo number_format($days_overdue * 10000, 0, ',', '.'); ?> (<?php echo $days_overdue; ?> hari × Rp 10.000)
                                                                 </small>
                                                             </div>
                                                             <input type="hidden" name="rental_id" value="<?php echo $row['id']; ?>">

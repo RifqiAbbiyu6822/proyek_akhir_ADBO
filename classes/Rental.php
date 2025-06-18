@@ -94,5 +94,22 @@ class Rental {
         return $rent_timestamp >= $today_timestamp && 
                $return_timestamp > $rent_timestamp;
     }
+
+    public function getOverdueRentals() {
+        try {
+            $query = "SELECT r.*, u.name as user_name, u.email, l.name as lens_name
+                      FROM rentals r
+                      JOIN users u ON r.user_id = u.id
+                      JOIN lenses l ON r.lens_id = l.id
+                      WHERE r.status = 'active' AND r.return_date < CURDATE()
+                      ORDER BY r.return_date ASC";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            return $stmt;
+        } catch (PDOException $e) {
+            error_log('Error getting overdue rentals: ' . $e->getMessage());
+            throw new Exception('Gagal mengambil data penyewaan terlambat');
+        }
+    }
 }
 ?> 
