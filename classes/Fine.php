@@ -14,7 +14,7 @@ class Fine {
                      FROM " . $this->table_name . " f
                      JOIN rentals r ON f.rental_id = r.id
                      JOIN lenses l ON r.lens_id = l.id
-                     WHERE f.user_id = ? 
+                     WHERE r.user_id = ? 
                      ORDER BY f.created_at DESC";
             
             $stmt = $this->conn->prepare($query);
