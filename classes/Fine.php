@@ -10,7 +10,7 @@ class Fine {
 
     public function getUserFines($user_id) {
         try {
-            $query = "SELECT f.*, r.rent_date, r.return_date, l.name as lens_name
+            $query = "SELECT f.*, r.rental_date, r.return_date, l.name as lens_name
                      FROM " . $this->table_name . " f
                      JOIN rentals r ON f.rental_id = r.id
                      JOIN lenses l ON r.lens_id = l.id
