@@ -57,11 +57,11 @@ class Rental {
 
             // Create rental
             $query = "INSERT INTO " . $this->table_name . " 
-                     (user_id, lens_id, rent_date, return_date, status, total_price) 
-                     VALUES (?, ?, ?, ?, 'active', ?)";
+                     (user_id, lens_id, rental_date, return_date, status) 
+                     VALUES (?, ?, ?, ?, 'active')";
             
             $stmt = $this->conn->prepare($query);
-            return $stmt->execute([$user_id, $lens_id, $rent_date, $return_date, $total_price]);
+            return $stmt->execute([$user_id, $lens_id, $rent_date, $return_date]);
         } catch (PDOException $e) {
             error_log("Error creating rental: " . $e->getMessage());
             throw new Exception("Gagal membuat penyewaan");
