@@ -39,6 +39,19 @@ try {
         throw $e;
     }
 
+    // Setelah query $user_fines, fetch semua ke array
+    $user_fines_data = [];
+    if ($user_fines) {
+        while ($row = $user_fines->fetch(PDO::FETCH_ASSOC)) {
+            $user_fines_data[] = $row;
+        }
+    }
+    // Hitung total denda
+    $total_fine = 0;
+    foreach ($user_fines_data as $f) {
+        $total_fine += isset($f['amount']) ? $f['amount'] : 0;
+    }
+
     // Proses pembayaran denda oleh user
     if (isset($_POST['pay_fine'])) {
         $fine_id = isset($_POST['fine_id']) ? (int)$_POST['fine_id'] : 0;
@@ -66,15 +79,10 @@ try {
 
     // Hitung total harga penyewaan dan total denda user
     $total_rental = 0;
-    $total_fine = 0;
+    $total_tagihan = 0;
     if ($user_rentals) {
         foreach ($user_rentals as $r) {
             $total_rental += isset($r['total_price']) ? $r['total_price'] : 0;
-        }
-    }
-    if ($user_fines) {
-        foreach ($user_fines as $f) {
-            $total_fine += isset($f['amount']) ? $f['amount'] : 0;
         }
     }
     $total_tagihan = $total_rental + $total_fine;
@@ -192,7 +200,7 @@ try {
                         <div class="alert alert-success"><?php echo htmlspecialchars($success_message); ?></div>
                     <?php endif; ?>
                     <p class="text-muted">Denda bisa bernilai 0 jika pengembalian tepat waktu.</p>
-                    <?php if ($user_fines && $user_fines->rowCount() > 0): ?>
+                    <?php if (count($user_fines_data) > 0): ?>
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
@@ -204,24 +212,24 @@ try {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php while ($row = $user_fines->fetch(PDO::FETCH_ASSOC)): ?>
-                                        <tr>
-                                            <td><?php echo date('d/m/Y', strtotime($row['created_at'])); ?></td>
-                                            <td>Rp <?php echo number_format($row['amount'], 0, ',', '.'); ?></td>
-                                            <td>
-                                                <span class="badge bg-<?php echo $row['status'] === 'paid' ? 'success' : 'warning'; ?>">
-                                                    <?php echo htmlspecialchars($row['status']); ?>
-                                                </span>
-                                                <?php if ($row['status'] == 'pending'): ?>
-                                                    <form method="post" style="display:inline;">
-                                                        <input type="hidden" name="fine_id" value="<?php echo $row['id']; ?>">
-                                                        <button type="submit" name="pay_fine" class="btn btn-success btn-sm">Bayar Denda</button>
-                                                    </form>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td><?php echo htmlspecialchars($row['description'] ?? '-'); ?></td>
-                                        </tr>
-                                    <?php endwhile; ?>
+                                    <?php foreach ($user_fines_data as $row): ?>
+                                    <tr>
+                                        <td><?php echo date('d/m/Y', strtotime($row['created_at'])); ?></td>
+                                        <td>Rp <?php echo number_format($row['amount'], 0, ',', '.'); ?></td>
+                                        <td>
+                                            <span class="badge bg-<?php echo $row['status'] === 'paid' ? 'success' : 'warning'; ?>">
+                                                <?php echo htmlspecialchars($row['status']); ?>
+                                            </span>
+                                            <?php if ($row['status'] == 'pending'): ?>
+                                                <form method="post" style="display:inline;">
+                                                    <input type="hidden" name="fine_id" value="<?php echo $row['id']; ?>">
+                                                    <button type="submit" name="pay_fine" class="btn btn-success btn-sm">Bayar Denda</button>
+                                                </form>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?php echo htmlspecialchars($row['description'] ?? '-'); ?></td>
+                                    </tr>
+                                    <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>
