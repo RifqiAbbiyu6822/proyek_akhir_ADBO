@@ -16,6 +16,9 @@ $rental = new Rental($db);
 $fine = new Fine($db);
 $lens = new Lens($db);
 
+$overdue_rentals_error = '';
+$overdue_rentals = false;
+$all_lenses = false;
 $success_message = '';
 $error_message = '';
 
@@ -47,14 +50,11 @@ if (isset($_POST['return_lens'])) {
     }
 }
 
-$overdue_rentals = false;
-$overdue_rentals_error = '';
 try {
     $overdue_rentals = $rental->getOverdueRentals();
 } catch (Exception $e) {
     $overdue_rentals_error = $e->getMessage();
 }
-$all_lenses = false;
 try {
     $all_lenses = $lens->readAll();
 } catch (Exception $e) {
@@ -219,32 +219,38 @@ try {
                 <h5>Manajemen Lensa</h5>
             </div>
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Nama Lensa</th>
-                                <th>Deskripsi</th>
-                                <th>Harga/hari</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($row = $all_lenses->fetch(PDO::FETCH_ASSOC)): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                <td><?php echo htmlspecialchars($row['description']); ?></td>
-                                <td>Rp <?php echo number_format($row['price_per_day'], 0, ',', '.'); ?></td>
-                                <td>
-                                    <span class="badge <?php echo $row['status'] == 'available' ? 'bg-success' : 'bg-warning'; ?>">
-                                        <?php echo $row['status'] == 'available' ? 'Tersedia' : 'Disewa'; ?>
-                                    </span>
-                                </td>
-                            </tr>
-                            <?php endwhile; ?>
-                        </tbody>
-                    </table>
-                </div>
+                <?php if ($all_lenses && $all_lenses->rowCount() > 0): ?>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nama Lensa</th>
+                                    <th>Deskripsi</th>
+                                    <th>Harga/hari</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while ($row = $all_lenses->fetch(PDO::FETCH_ASSOC)): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($row['name']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['description']); ?></td>
+                                    <td>Rp <?php echo number_format($row['price_per_day'], 0, ',', '.'); ?></td>
+                                    <td>
+                                        <span class="badge <?php echo $row['status'] == 'available' ? 'bg-success' : 'bg-warning'; ?>">
+                                            <?php echo $row['status'] == 'available' ? 'Tersedia' : 'Disewa'; ?>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php elseif ($all_lenses): ?>
+                    <p>Tidak ada lensa.</p>
+                <?php else: ?>
+                    <div class="alert alert-danger">Gagal mengambil data lensa.</div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
