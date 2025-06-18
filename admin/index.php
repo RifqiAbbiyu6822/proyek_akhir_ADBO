@@ -197,7 +197,7 @@ try {
                                                         data-bs-target="#payFineModal<?php echo $row['id']; ?>">
                                                     Bayar Denda
                                                 </button>
-                                            <?php elseif (!$fine_data && $is_overdue): ?>
+                                            <?php elseif (!$fine_data): ?>
                                                 <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" 
                                                         data-bs-target="#fineModal<?php echo $row['id']; ?>">
                                                     Buat Denda
@@ -358,7 +358,32 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Tidak ada perhitungan otomatis denda
+        document.querySelectorAll('.modal').forEach(function(modal) {
+            const fineDays = modal.querySelector('.fine-days');
+            const damageType = modal.querySelector('.damage-type');
+            const fineAmount = modal.querySelector('.fine-amount');
+            if (!fineDays || !damageType || !fineAmount) return;
+            function updateFine() {
+                let days = parseInt(fineDays.value) || 0;
+                if (days < 0) {
+                    days = 0;
+                    fineDays.value = 0;
+                }
+                let base = days * 10000;
+                let damage = 0;
+                switch (damageType.value) {
+                    case 'ringan': damage = 20000; break;
+                    case 'sedang': damage = 50000; break;
+                    case 'berat': damage = 100000; break;
+                    default: damage = 0;
+                }
+                let total = base + damage;
+                fineAmount.value = total;
+            }
+            fineDays.addEventListener('input', updateFine);
+            damageType.addEventListener('change', updateFine);
+            modal.addEventListener('shown.bs.modal', updateFine);
+        });
     });
     </script>
 </body>
