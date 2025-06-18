@@ -10,11 +10,11 @@ class Rental {
     public function getUserRentals($user_id) {
         try {
             $query = "SELECT r.*, l.name as lens_name, l.price_per_day,
-                     (DATEDIFF(r.return_date, r.rent_date) + 1) * l.price_per_day as total_price
+                     (DATEDIFF(r.return_date, r.rental_date) + 1) * l.price_per_day as total_price
                      FROM " . $this->table_name . " r 
                      JOIN lenses l ON r.lens_id = l.id 
                      WHERE r.user_id = ? 
-                     ORDER BY r.rent_date DESC";
+                     ORDER BY r.rental_date DESC";
             
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(1, $user_id);
