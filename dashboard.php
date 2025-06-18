@@ -85,7 +85,19 @@ try {
             $total_rental += isset($r['total_price']) ? $r['total_price'] : 0;
         }
     }
-    $total_tagihan = $total_rental + $total_fine;
+    // Cek apakah semua denda sudah paid
+    $all_fines_paid = true;
+    foreach ($user_fines_data as $f) {
+        if ($f['status'] !== 'paid') {
+            $all_fines_paid = false;
+            break;
+        }
+    }
+    if ($all_fines_paid && count($user_fines_data) > 0) {
+        $total_tagihan = 0;
+    } else {
+        $total_tagihan = $total_rental + $total_fine;
+    }
 } catch (Exception $e) {
     error_log("Dashboard error: " . $e->getMessage());
     $error_message = "Terjadi kesalahan saat memuat data. Silakan coba lagi nanti.";
@@ -221,10 +233,7 @@ try {
                                                 <?php echo htmlspecialchars($row['status']); ?>
                                             </span>
                                             <?php if ($row['status'] == 'pending'): ?>
-                                                <form method="post" style="display:inline;">
-                                                    <input type="hidden" name="fine_id" value="<?php echo $row['id']; ?>">
-                                                    <button type="submit" name="pay_fine" class="btn btn-success btn-sm">Bayar Denda</button>
-                                                </form>
+                                                <span class="text-danger ms-2">Silakan bayar denda ke outlet.</span>
                                             <?php endif; ?>
                                         </td>
                                         <td><?php echo htmlspecialchars($row['description'] ?? '-'); ?></td>
