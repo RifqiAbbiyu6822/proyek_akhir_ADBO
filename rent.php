@@ -5,6 +5,10 @@ require_once 'classes/Lens.php';
 require_once 'classes/Rental.php';
 
 requireLogin();
+if ($_SESSION['user_id'] == 4) {
+    header('Location: admin/index.php');
+    exit();
+}
 
 try {
     $database = new Database();

@@ -3,8 +3,13 @@ require_once 'includes/auth.php';
 
 // If user is already logged in, redirect to dashboard
 if (isLoggedIn()) {
-    header("Location: dashboard.php");
-    exit();
+    if ($_SESSION['user_id'] == 4) {
+        header('Location: admin/index.php');
+        exit();
+    } else {
+        header('Location: dashboard.php');
+        exit();
+    }
 }
 
 $error = '';

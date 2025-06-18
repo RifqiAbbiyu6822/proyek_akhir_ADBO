@@ -90,12 +90,19 @@ try {
             
             <!-- Active Rentals -->
             <div class="card mb-4">
+                <?php if ($_SESSION['user_id'] != 4): ?>
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">Penyewaan Aktif</h4>
                     <a href="index.php" class="btn btn-primary btn-sm">
                         <i class="bi bi-plus-circle"></i> Sewa Baru
                     </a>
                 </div>
+                <?php else: ?>
+                <div class="card-header">
+                    <h4 class="mb-0">Penyewaan Aktif</h4>
+                    <span class="badge bg-info">Admin tidak dapat menyewa lensa</span>
+                </div>
+                <?php endif; ?>
                 <div class="card-body">
                     <?php if ($user_rentals && $user_rentals->rowCount() > 0): ?>
                         <div class="table-responsive">

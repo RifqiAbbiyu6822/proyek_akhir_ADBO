@@ -26,7 +26,10 @@ $error_message = '';
 // Process fine creation
 if (isset($_POST['create_fine'])) {
     $rental_id = $_POST['rental_id'];
+    $fine_days = isset($_POST['fine_days']) ? (int)$_POST['fine_days'] : 1;
+    if ($fine_days < 1) $fine_days = 1;
     $amount = $_POST['fine_amount'];
+    if ($amount < 0) $amount = 0;
     if ($fine->create($rental_id, $amount)) {
         $success_message = "Denda berhasil dibuat!";
     } else {
@@ -266,7 +269,11 @@ try {
         const fineAmount = modal.querySelector('.fine-amount');
         const fineSuggestion = modal.querySelector('.fine-suggestion');
         function updateFine() {
-            let days = parseInt(fineDays.value) || 0;
+            let days = parseInt(fineDays.value) || 1;
+            if (days < 1) {
+                days = 1;
+                fineDays.value = 1;
+            }
             let base = days * 10000;
             let damage = 0;
             switch (damageType.value) {
