@@ -43,7 +43,7 @@ if (isset($_POST['create_fine'])) {
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) $user_id = $row['user_id'];
     } catch (Exception $e) {}
-    if ($fine->create($user_id, $rental_id, $amount, $description)) {
+    if ($fine->create($rental_id, $amount)) {
         $success_message = "Denda berhasil dibuat!";
     } else {
         $error_message = "Gagal membuat denda!";

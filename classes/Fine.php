@@ -30,18 +30,17 @@ class Fine {
         }
     }
 
-    public function create($user_id, $rental_id, $amount, $description) {
+    public function create($rental_id, $amount) {
         try {
             // Validate input
-            if ($amount <= 0) {
-                throw new Exception("Jumlah denda harus lebih dari 0");
+            if ($amount < 0) {
+                throw new Exception("Jumlah denda tidak boleh negatif");
             }
 
-            // Check if rental exists and belongs to user
-            $query = "SELECT id FROM rentals WHERE id = ? AND user_id = ?";
+            // Check if rental exists
+            $query = "SELECT id FROM rentals WHERE id = ?";
             $stmt = $this->conn->prepare($query);
-            $stmt->execute([$rental_id, $user_id]);
-            
+            $stmt->execute([$rental_id]);
             if (!$stmt->fetch()) {
                 throw new Exception("Data penyewaan tidak ditemukan");
             }
@@ -50,18 +49,14 @@ class Fine {
             $query = "SELECT id FROM " . $this->table_name . " WHERE rental_id = ?";
             $stmt = $this->conn->prepare($query);
             $stmt->execute([$rental_id]);
-            
             if ($stmt->fetch()) {
                 throw new Exception("Denda untuk penyewaan ini sudah ada");
             }
 
             // Create fine
-            $query = "INSERT INTO " . $this->table_name . " 
-                     (user_id, rental_id, amount, description, status) 
-                     VALUES (?, ?, ?, ?, 'pending')";
-            
+            $query = "INSERT INTO " . $this->table_name . " (rental_id, amount, status) VALUES (?, ?, 'pending')";
             $stmt = $this->conn->prepare($query);
-            return $stmt->execute([$user_id, $rental_id, $amount, $description]);
+            return $stmt->execute([$rental_id, $amount]);
         } catch (PDOException $e) {
             error_log("Error creating fine: " . $e->getMessage());
             throw new Exception("Gagal membuat denda");
