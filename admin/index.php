@@ -17,7 +17,13 @@ $fine = new Fine($db);
 $lens = new Lens($db);
 
 // Get overdue rentals for fine calculation
-$overdue_rentals = $rental->getOverdueRentals();
+$overdue_rentals = false;
+$overdue_rentals_error = '';
+try {
+    $overdue_rentals = $rental->getOverdueRentals();
+} catch (Exception $e) {
+    $overdue_rentals_error = $e->getMessage();
+}
 $all_lenses = $lens->readAll();
 
 // Process fine creation
@@ -87,7 +93,9 @@ if (isset($_POST['return_lens'])) {
                 <h5>Penyewaan Terlambat</h5>
             </div>
             <div class="card-body">
-                <?php if ($overdue_rentals->rowCount() > 0): ?>
+                <?php if ($overdue_rentals_error): ?>
+                    <div class="alert alert-danger">Error: <?php echo htmlspecialchars($overdue_rentals_error); ?></div>
+                <?php elseif ($overdue_rentals && $overdue_rentals->rowCount() > 0): ?>
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
