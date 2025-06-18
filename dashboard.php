@@ -63,6 +63,21 @@ try {
             }
         }
     }
+
+    // Hitung total harga penyewaan dan total denda user
+    $total_rental = 0;
+    $total_fine = 0;
+    if ($user_rentals) {
+        foreach ($user_rentals as $r) {
+            $total_rental += isset($r['total_price']) ? $r['total_price'] : 0;
+        }
+    }
+    if ($user_fines) {
+        foreach ($user_fines as $f) {
+            $total_fine += isset($f['amount']) ? $f['amount'] : 0;
+        }
+    }
+    $total_tagihan = $total_rental + $total_fine;
 } catch (Exception $e) {
     error_log("Dashboard error: " . $e->getMessage());
     $error_message = "Terjadi kesalahan saat memuat data. Silakan coba lagi nanti.";
@@ -170,6 +185,13 @@ try {
                     <h4 class="mb-0">Denda</h4>
                 </div>
                 <div class="card-body">
+                    <?php if (!empty($error_message)): ?>
+                        <div class="alert alert-danger"><?php echo htmlspecialchars($error_message); ?></div>
+                    <?php endif; ?>
+                    <?php if (!empty($success_message)): ?>
+                        <div class="alert alert-success"><?php echo htmlspecialchars($success_message); ?></div>
+                    <?php endif; ?>
+                    <p class="text-muted">Denda bisa bernilai 0 jika pengembalian tepat waktu.</p>
                     <?php if ($user_fines && $user_fines->rowCount() > 0): ?>
                         <div class="table-responsive">
                             <table class="table table-hover">
@@ -207,6 +229,11 @@ try {
                         <p class="text-muted">Tidak ada denda.</p>
                     <?php endif; ?>
                 </div>
+            </div>
+
+            <div class="alert alert-info mt-3">
+                <strong>Total Tagihan Anda:</strong> Rp <?php echo number_format($total_tagihan, 0, ',', '.'); ?>
+                <br><small>(Total harga penyewaan: Rp <?php echo number_format($total_rental, 0, ',', '.'); ?>, Total denda: Rp <?php echo number_format($total_fine, 0, ',', '.'); ?>)</small>
             </div>
         <?php endif; ?>
     </div>

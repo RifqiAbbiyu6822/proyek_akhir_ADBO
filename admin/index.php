@@ -27,22 +27,9 @@ $error_message = '';
 if (isset($_POST['create_fine'])) {
     $rental_id = $_POST['rental_id'];
     $fine_days = isset($_POST['fine_days']) ? (int)$_POST['fine_days'] : 0;
-    if ($fine_days < 1) $fine_days = 0;
+    if ($fine_days < 0) $fine_days = 0;
     $amount = isset($_POST['fine_amount']) ? (int)$_POST['fine_amount'] : 0;
     if ($amount < 0) $amount = 0;
-    $damage_type = isset($_POST['damage_type']) ? $_POST['damage_type'] : 'none';
-    $description = "Denda keterlambatan";
-    if ($damage_type !== 'none') {
-        $description .= ", kerusakan: " . $damage_type;
-    }
-    // Ambil user_id dari rental terkait
-    $user_id = 0;
-    try {
-        $stmt = $db->prepare("SELECT user_id FROM rentals WHERE id = ?");
-        $stmt->execute([$rental_id]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($row) $user_id = $row['user_id'];
-    } catch (Exception $e) {}
     if ($fine->create($rental_id, $amount)) {
         $success_message = "Denda berhasil dibuat!";
     } else {
@@ -193,8 +180,7 @@ try {
                                             }
                                             ?>
                                             <?php if (!$has_fine): ?>
-                                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" 
-                                                    data-bs-target="#fineModal<?php echo $row['id']; ?>">
+                                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#fineModal<?php echo $row['id']; ?>">
                                                 Buat Denda
                                             </button>
                                             <?php endif; ?>
@@ -236,7 +222,7 @@ try {
                                                             <p>Buat denda untuk <strong><?php echo htmlspecialchars($row['user_name']); ?></strong></p>
                                                             <div class="mb-3">
                                                                 <label for="fine_days_<?php echo $row['id']; ?>" class="form-label">Hari Keterlambatan</label>
-                                                                <input type="number" class="form-control fine-days" name="fine_days" id="fine_days_<?php echo $row['id']; ?>" value="<?php echo $days_overdue; ?>" min="1" required>
+                                                                <input type="number" class="form-control fine-days" name="fine_days" id="fine_days_<?php echo $row['id']; ?>" value="<?php echo $days_overdue; ?>" min="0" required>
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="damage_type_<?php echo $row['id']; ?>" class="form-label">Jenis Kerusakan</label>
@@ -321,7 +307,6 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Untuk semua modal denda
         document.querySelectorAll('.modal').forEach(function(modal) {
             const fineDays = modal.querySelector('.fine-days');
             const damageType = modal.querySelector('.damage-type');
@@ -329,10 +314,10 @@ try {
             const fineSuggestion = modal.querySelector('.fine-suggestion');
             if (!fineDays || !damageType || !fineAmount || !fineSuggestion) return;
             function updateFine() {
-                let days = parseInt(fineDays.value) || 1;
-                if (days < 1) {
-                    days = 1;
-                    fineDays.value = 1;
+                let days = parseInt(fineDays.value) || 0;
+                if (days < 0) {
+                    days = 0;
+                    fineDays.value = 0;
                 }
                 let base = days * 10000;
                 let damage = 0;
@@ -348,7 +333,6 @@ try {
             }
             fineDays.addEventListener('input', updateFine);
             damageType.addEventListener('change', updateFine);
-            // Inisialisasi saat modal dibuka
             modal.addEventListener('shown.bs.modal', updateFine);
         });
     });
