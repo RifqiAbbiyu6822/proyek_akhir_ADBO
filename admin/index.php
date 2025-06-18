@@ -49,21 +49,38 @@ if (isset($_POST['create_fine'])) {
         $error_message = "Gagal membuat denda!";
     }
 }
+// Proses pembayaran denda
+if (isset($_POST['pay_fine'])) {
+    $fine_id = $_POST['fine_id'];
+    try {
+        $fine->updateStatus($fine_id, 'paid');
+        $success_message = "Denda berhasil ditandai sudah dibayar!";
+    } catch (Exception $e) {
+        $error_message = "Gagal update status denda: " . $e->getMessage();
+    }
+}
 // Process lens return
 if (isset($_POST['return_lens'])) {
     $rental_id = $_POST['rental_id'];
     $lens_id = $_POST['lens_id'];
-    $db->beginTransaction();
-    try {
-        if ($rental->returnLens($rental_id) && $lens->updateStatus($lens_id, 'available')) {
-            $db->commit();
-            $success_message = "Lensa berhasil dikembalikan!";
-        } else {
-            throw new Exception("Gagal mengembalikan lensa");
+    // Cek denda pending
+    $stmt = $db->prepare("SELECT id FROM fines WHERE rental_id = ? AND status = 'pending'");
+    $stmt->execute([$rental_id]);
+    if ($stmt->fetch()) {
+        $error_message = "Tidak bisa mengembalikan lensa sebelum denda dibayar.";
+    } else {
+        $db->beginTransaction();
+        try {
+            if ($rental->returnLens($rental_id) && $lens->updateStatus($lens_id, 'available')) {
+                $db->commit();
+                $success_message = "Lensa berhasil dikembalikan!";
+            } else {
+                throw new Exception("Gagal mengembalikan lensa");
+            }
+        } catch (Exception $e) {
+            $db->rollback();
+            $error_message = "Terjadi kesalahan: " . $e->getMessage();
         }
-    } catch (Exception $e) {
-        $db->rollback();
-        $error_message = "Terjadi kesalahan: " . $e->getMessage();
     }
 }
 
