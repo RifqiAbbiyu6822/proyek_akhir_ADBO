@@ -26,11 +26,24 @@ $error_message = '';
 // Process fine creation
 if (isset($_POST['create_fine'])) {
     $rental_id = $_POST['rental_id'];
-    $fine_days = isset($_POST['fine_days']) ? (int)$_POST['fine_days'] : 1;
-    if ($fine_days < 1) $fine_days = 1;
-    $amount = $_POST['fine_amount'];
+    $fine_days = isset($_POST['fine_days']) ? (int)$_POST['fine_days'] : 0;
+    if ($fine_days < 1) $fine_days = 0;
+    $amount = isset($_POST['fine_amount']) ? (int)$_POST['fine_amount'] : 0;
     if ($amount < 0) $amount = 0;
-    if ($fine->create($rental_id, $amount)) {
+    $damage_type = isset($_POST['damage_type']) ? $_POST['damage_type'] : 'none';
+    $description = "Denda keterlambatan";
+    if ($damage_type !== 'none') {
+        $description .= ", kerusakan: " . $damage_type;
+    }
+    // Ambil user_id dari rental terkait
+    $user_id = 0;
+    try {
+        $stmt = $db->prepare("SELECT user_id FROM rentals WHERE id = ?");
+        $stmt->execute([$rental_id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) $user_id = $row['user_id'];
+    } catch (Exception $e) {}
+    if ($fine->create($user_id, $rental_id, $amount, $description)) {
         $success_message = "Denda berhasil dibuat!";
     } else {
         $error_message = "Gagal membuat denda!";
@@ -120,6 +133,7 @@ try {
                                 <?php while ($row = $overdue_rentals->fetch(PDO::FETCH_ASSOC)): 
                                     $days_overdue = (strtotime('now') - strtotime($row['return_date'])) / (60*60*24);
                                     $days_overdue = floor($days_overdue);
+                                    if ($days_overdue < 1) $days_overdue = 0;
                                 ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($row['user_name']); ?></td>
@@ -190,7 +204,7 @@ try {
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="fine_amount_<?php echo $row['id']; ?>" class="form-label">Jumlah Denda (Rp)</label>
-                                                                <input type="number" class="form-control fine-amount" name="fine_amount" id="fine_amount_<?php echo $row['id']; ?>" value="<?php echo $days_overdue * 10000; ?>" required>
+                                                                <input type="number" class="form-control fine-amount" name="fine_amount" id="fine_amount_<?php echo $row['id']; ?>" value="<?php echo $days_overdue * 10000; ?>" min="0" required>
                                                                 <small class="form-text text-muted">
                                                                     Saran: Rp <span class="fine-suggestion"><?php echo number_format($days_overdue * 10000, 0, ',', '.'); ?></span> (<?php echo $days_overdue; ?> hari × Rp 10.000 + denda kerusakan)
                                                                 </small>

@@ -111,5 +111,16 @@ class Rental {
             throw new Exception('Gagal mengambil data penyewaan aktif');
         }
     }
+
+    public function returnLens($rental_id) {
+        try {
+            $query = "UPDATE " . $this->table_name . " SET status = 'returned' WHERE id = ?";
+            $stmt = $this->conn->prepare($query);
+            return $stmt->execute([$rental_id]);
+        } catch (PDOException $e) {
+            error_log('Error returning lens: ' . $e->getMessage());
+            throw new Exception('Gagal mengembalikan lensa');
+        }
+    }
 }
 ?> 
