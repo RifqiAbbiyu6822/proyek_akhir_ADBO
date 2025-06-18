@@ -8,6 +8,10 @@ require_once 'includes/auth.php';
 require_once 'classes/Rental.php';
 require_once 'classes/Fine.php';
 
+// Debug: Cek session
+var_dump($_SESSION);
+echo "<hr>";
+
 // Ensure user is logged in
 requireLogin();
 
@@ -26,9 +30,27 @@ try {
         throw new Exception("User data not found");
     }
 
+    // Debug: Cek user_id
+    echo "User ID: " . $_SESSION['user_id'] . "<hr>";
+
     // Get user's rentals and fines
-    $user_rentals = $rental->getUserRentals($_SESSION['user_id']);
-    $user_fines = $fine->getUserFines($_SESSION['user_id']);
+    try {
+        $user_rentals = $rental->getUserRentals($_SESSION['user_id']);
+        // Debug: Cek hasil query rentals
+        echo "Jumlah rentals: " . $user_rentals->rowCount() . "<hr>";
+    } catch (Exception $e) {
+        echo "Error rentals: " . $e->getMessage() . "<hr>";
+        throw $e;
+    }
+
+    try {
+        $user_fines = $fine->getUserFines($_SESSION['user_id']);
+        // Debug: Cek hasil query fines
+        echo "Jumlah fines: " . $user_fines->rowCount() . "<hr>";
+    } catch (Exception $e) {
+        echo "Error fines: " . $e->getMessage() . "<hr>";
+        throw $e;
+    }
 } catch (Exception $e) {
     error_log("Dashboard error: " . $e->getMessage());
     $error_message = "Terjadi kesalahan saat memuat data. Silakan coba lagi nanti.";
