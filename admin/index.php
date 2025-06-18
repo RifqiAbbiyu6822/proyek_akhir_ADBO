@@ -30,7 +30,9 @@ if (isset($_POST['create_fine'])) {
     if ($fine_days < 0) $fine_days = 0;
     $amount = isset($_POST['fine_amount']) ? (int)$_POST['fine_amount'] : 0;
     if ($amount < 0) $amount = 0;
-    if ($fine->create($rental_id, $amount)) {
+    $damage_type = isset($_POST['damage_type']) ? $_POST['damage_type'] : 'none';
+    $description = 'Kerusakan: ' . $damage_type . ', Hari keterlambatan: ' . $fine_days;
+    if ($fine->create($rental_id, $amount, $description)) {
         $success_message = "Denda berhasil dibuat!";
     } else {
         $error_message = "Gagal membuat denda!";
@@ -279,17 +281,14 @@ try {
                                                                 <label for="damage_type_<?php echo $row['id']; ?>" class="form-label">Jenis Kerusakan</label>
                                                                 <select class="form-select damage-type" name="damage_type" id="damage_type_<?php echo $row['id']; ?>">
                                                                     <option value="none" selected>Tidak Ada</option>
-                                                                    <option value="ringan">Ringan (+Rp 20.000)</option>
-                                                                    <option value="sedang">Sedang (+Rp 50.000)</option>
-                                                                    <option value="berat">Berat (+Rp 100.000)</option>
+                                                                    <option value="ringan">Ringan</option>
+                                                                    <option value="sedang">Sedang</option>
+                                                                    <option value="berat">Berat</option>
                                                                 </select>
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="fine_amount_<?php echo $row['id']; ?>" class="form-label">Jumlah Denda (Rp)</label>
-                                                                <input type="number" class="form-control fine-amount" name="fine_amount" id="fine_amount_<?php echo $row['id']; ?>" value="<?php echo $days_overdue * 10000; ?>" min="0" required>
-                                                                <small class="form-text text-muted">
-                                                                    Saran: Rp <span class="fine-suggestion"><?php echo number_format($days_overdue * 10000, 0, ',', '.'); ?></span> (<?php echo $days_overdue; ?> hari × Rp 10.000 + denda kerusakan)
-                                                                </small>
+                                                                <input type="number" class="form-control fine-amount" name="fine_amount" id="fine_amount_<?php echo $row['id']; ?>" value="" min="0" required>
                                                             </div>
                                                             <input type="hidden" name="rental_id" value="<?php echo $row['id']; ?>">
                                                         </div>
@@ -359,34 +358,7 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.modal').forEach(function(modal) {
-            const fineDays = modal.querySelector('.fine-days');
-            const damageType = modal.querySelector('.damage-type');
-            const fineAmount = modal.querySelector('.fine-amount');
-            const fineSuggestion = modal.querySelector('.fine-suggestion');
-            if (!fineDays || !damageType || !fineAmount || !fineSuggestion) return;
-            function updateFine() {
-                let days = parseInt(fineDays.value) || 0;
-                if (days < 0) {
-                    days = 0;
-                    fineDays.value = 0;
-                }
-                let base = days * 10000;
-                let damage = 0;
-                switch (damageType.value) {
-                    case 'ringan': damage = 20000; break;
-                    case 'sedang': damage = 50000; break;
-                    case 'berat': damage = 100000; break;
-                    default: damage = 0;
-                }
-                let total = base + damage;
-                fineAmount.value = total;
-                fineSuggestion.textContent = total.toLocaleString('id-ID');
-            }
-            fineDays.addEventListener('input', updateFine);
-            damageType.addEventListener('change', updateFine);
-            modal.addEventListener('shown.bs.modal', updateFine);
-        });
+        // Tidak ada perhitungan otomatis denda
     });
     </script>
 </body>

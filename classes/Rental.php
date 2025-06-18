@@ -127,5 +127,23 @@ class Rental {
             throw new Exception('Gagal mengembalikan lensa');
         }
     }
+
+    public function getUserRentalHistory($user_id) {
+        try {
+            $query = "SELECT r.*, l.name as lens_name, l.price_per_day,
+                     (DATEDIFF(r.return_date, r.rental_date) + 1) * l.price_per_day as total_price
+                     FROM " . $this->table_name . " r 
+                     JOIN lenses l ON r.lens_id = l.id 
+                     WHERE r.user_id = ? 
+                     ORDER BY r.rental_date DESC";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(1, $user_id);
+            $stmt->execute();
+            return $stmt;
+        } catch (PDOException $e) {
+            error_log("Error getting user rental history: " . $e->getMessage());
+            throw new Exception("Gagal mengambil riwayat penyewaan");
+        }
+    }
 }
 ?>

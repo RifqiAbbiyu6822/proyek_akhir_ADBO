@@ -29,6 +29,7 @@ try {
     // Get user's rentals and fines
     try {
         $user_rentals = $rental->getUserRentals($_SESSION['user_id']);
+        $user_rental_history = $rental->getUserRentalHistory($_SESSION['user_id']);
     } catch (Exception $e) {
         throw $e;
     }
@@ -164,7 +165,16 @@ try {
                 </div>
                 <?php endif; ?>
                 <div class="card-body">
-                    <?php if ($user_rentals && $user_rentals->rowCount() > 0): ?>
+                    <?php
+                    $user_rentals->execute();
+                    $active_rows = [];
+                    while ($row = $user_rentals->fetch(PDO::FETCH_ASSOC)) {
+                        if ($row['status'] === 'active') {
+                            $active_rows[] = $row;
+                        }
+                    }
+                    ?>
+                    <?php if (count($active_rows) > 0): ?>
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
@@ -177,7 +187,58 @@ try {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php while ($row = $user_rentals->fetch(PDO::FETCH_ASSOC)): ?>
+                                    <?php foreach ($active_rows as $row): ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($row['lens_name']); ?></td>
+                                            <td><?php echo date('d/m/Y', strtotime($row['rental_date'])); ?></td>
+                                            <td><?php echo date('d/m/Y', strtotime($row['return_date'])); ?></td>
+                                            <td>
+                                                <span class="badge bg-success">Aktif</span>
+                                            </td>
+                                            <td>Rp <?php echo number_format($row['total_price'], 0, ',', '.'); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php else: ?>
+                        <p class="text-muted">Tidak ada penyewaan aktif.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="alert alert-info mt-3">
+                <strong>Total Tagihan Anda:</strong> Rp <?php echo number_format($total_tagihan, 0, ',', '.'); ?>
+                <br><small>(Total harga penyewaan: Rp <?php echo number_format($total_rental, 0, ',', '.'); ?>, Total denda: Rp <?php echo number_format($total_fine, 0, ',', '.'); ?>)</small>
+            </div>
+
+            <!-- Rental History -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Riwayat Penyewaan</h4>
+                </div>
+                <div class="card-body">
+                    <?php
+                    $user_rental_history->execute();
+                    $history_rows = [];
+                    while ($row = $user_rental_history->fetch(PDO::FETCH_ASSOC)) {
+                        $history_rows[] = $row;
+                    }
+                    ?>
+                    <?php if (count($history_rows) > 0): ?>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Lensa</th>
+                                        <th>Tanggal Sewa</th>
+                                        <th>Tanggal Kembali</th>
+                                        <th>Status</th>
+                                        <th>Total Biaya</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($history_rows as $row): ?>
                                         <tr>
                                             <td><?php echo htmlspecialchars($row['lens_name']); ?></td>
                                             <td><?php echo date('d/m/Y', strtotime($row['rental_date'])); ?></td>
@@ -189,68 +250,14 @@ try {
                                             </td>
                                             <td>Rp <?php echo number_format($row['total_price'], 0, ',', '.'); ?></td>
                                         </tr>
-                                    <?php endwhile; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    <?php else: ?>
-                        <p class="text-muted">Tidak ada penyewaan aktif.</p>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <!-- Fines -->
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="mb-0">Denda</h4>
-                </div>
-                <div class="card-body">
-                    <?php if (!empty($error_message)): ?>
-                        <div class="alert alert-danger"><?php echo htmlspecialchars($error_message); ?></div>
-                    <?php endif; ?>
-                    <?php if (!empty($success_message)): ?>
-                        <div class="alert alert-success"><?php echo htmlspecialchars($success_message); ?></div>
-                    <?php endif; ?>
-                    <p class="text-muted">Denda bisa bernilai 0 jika pengembalian tepat waktu.</p>
-                    <?php if (count($user_fines_data) > 0): ?>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Tanggal</th>
-                                        <th>Jumlah</th>
-                                        <th>Status</th>
-                                        <th>Keterangan</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($user_fines_data as $row): ?>
-                                    <tr>
-                                        <td><?php echo date('d/m/Y', strtotime($row['created_at'])); ?></td>
-                                        <td>Rp <?php echo number_format($row['amount'], 0, ',', '.'); ?></td>
-                                        <td>
-                                            <span class="badge bg-<?php echo $row['status'] === 'paid' ? 'success' : 'warning'; ?>">
-                                                <?php echo htmlspecialchars($row['status']); ?>
-                                            </span>
-                                            <?php if ($row['status'] == 'pending'): ?>
-                                                <span class="text-danger ms-2">Silakan bayar denda ke outlet.</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td><?php echo htmlspecialchars($row['description'] ?? '-'); ?></td>
-                                    </tr>
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>
                     <?php else: ?>
-                        <p class="text-muted">Tidak ada denda.</p>
+                        <p class="text-muted">Belum ada riwayat penyewaan.</p>
                     <?php endif; ?>
                 </div>
-            </div>
-
-            <div class="alert alert-info mt-3">
-                <strong>Total Tagihan Anda:</strong> Rp <?php echo number_format($total_tagihan, 0, ',', '.'); ?>
-                <br><small>(Total harga penyewaan: Rp <?php echo number_format($total_rental, 0, ',', '.'); ?>, Total denda: Rp <?php echo number_format($total_fine, 0, ',', '.'); ?>)</small>
             </div>
         <?php endif; ?>
     </div>
