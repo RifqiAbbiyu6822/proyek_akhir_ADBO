@@ -262,7 +262,7 @@ try {
                                         </div>
 
                                         <!-- Fine Modal -->
-                                        <?php if (!$fine_data && $is_overdue): ?>
+                                        <?php if (!$fine_data): ?>
                                         <div class="modal fade" id="fineModal<?php echo $row['id']; ?>" tabindex="-1">
                                             <div class="modal-dialog">
                                                 <div class="modal-content">
