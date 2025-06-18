@@ -51,35 +51,52 @@ if (isset($_POST['create_fine'])) {
 }
 // Proses pembayaran denda
 if (isset($_POST['pay_fine'])) {
-    $fine_id = $_POST['fine_id'];
-    try {
-        $fine->updateStatus($fine_id, 'paid');
-        $success_message = "Denda berhasil ditandai sudah dibayar!";
-    } catch (Exception $e) {
-        $error_message = "Gagal update status denda: " . $e->getMessage();
+    $fine_id = isset($_POST['fine_id']) ? (int)$_POST['fine_id'] : 0;
+    if ($fine_id < 1) {
+        $error_message = "ID denda tidak valid.";
+    } else {
+        try {
+            $stmt = $db->prepare("SELECT * FROM fines WHERE id = ?");
+            $stmt->execute([$fine_id]);
+            $fine_row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$fine_row) {
+                $error_message = "Denda tidak ditemukan.";
+            } elseif ($fine_row['status'] !== 'pending') {
+                $error_message = "Denda sudah dibayar atau tidak bisa dibayar.";
+            } else {
+                $fine->updateStatus($fine_id, 'paid');
+                $success_message = "Denda berhasil ditandai sudah dibayar!";
+            }
+        } catch (Exception $e) {
+            $error_message = "Gagal update status denda: " . htmlspecialchars($e->getMessage());
+        }
     }
 }
 // Process lens return
 if (isset($_POST['return_lens'])) {
-    $rental_id = $_POST['rental_id'];
-    $lens_id = $_POST['lens_id'];
-    // Cek denda pending
-    $stmt = $db->prepare("SELECT id FROM fines WHERE rental_id = ? AND status = 'pending'");
-    $stmt->execute([$rental_id]);
-    if ($stmt->fetch()) {
-        $error_message = "Tidak bisa mengembalikan lensa sebelum denda dibayar.";
+    $rental_id = isset($_POST['rental_id']) ? (int)$_POST['rental_id'] : 0;
+    $lens_id = isset($_POST['lens_id']) ? (int)$_POST['lens_id'] : 0;
+    if ($rental_id < 1 || $lens_id < 1) {
+        $error_message = "ID rental/lensa tidak valid.";
     } else {
-        $db->beginTransaction();
-        try {
-            if ($rental->returnLens($rental_id) && $lens->updateStatus($lens_id, 'available')) {
-                $db->commit();
-                $success_message = "Lensa berhasil dikembalikan!";
-            } else {
-                throw new Exception("Gagal mengembalikan lensa");
+        // Cek denda pending
+        $stmt = $db->prepare("SELECT id FROM fines WHERE rental_id = ? AND status = 'pending'");
+        $stmt->execute([$rental_id]);
+        if ($stmt->fetch()) {
+            $error_message = "Tidak bisa mengembalikan lensa sebelum denda dibayar.";
+        } else {
+            $db->beginTransaction();
+            try {
+                if ($rental->returnLens($rental_id) && $lens->updateStatus($lens_id, 'available')) {
+                    $db->commit();
+                    $success_message = "Lensa berhasil dikembalikan!";
+                } else {
+                    throw new Exception("Gagal mengembalikan lensa");
+                }
+            } catch (Exception $e) {
+                $db->rollback();
+                $error_message = "Terjadi kesalahan: " . htmlspecialchars($e->getMessage());
             }
-        } catch (Exception $e) {
-            $db->rollback();
-            $error_message = "Terjadi kesalahan: " . $e->getMessage();
         }
     }
 }
@@ -166,10 +183,21 @@ try {
                                                 Kembalikan
                                             </button>
                                             <!-- Fine Button -->
+                                            <?php
+                                            $has_fine = false;
+                                            $stmt_fine = $db->prepare("SELECT amount, status FROM fines WHERE rental_id = ?");
+                                            $stmt_fine->execute([$row['id']]);
+                                            $fine_data = $stmt_fine->fetch(PDO::FETCH_ASSOC);
+                                            if ($fine_data) {
+                                                $has_fine = true;
+                                            }
+                                            ?>
+                                            <?php if (!$has_fine): ?>
                                             <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" 
                                                     data-bs-target="#fineModal<?php echo $row['id']; ?>">
                                                 Buat Denda
                                             </button>
+                                            <?php endif; ?>
                                         </div>
 
                                         <!-- Return Modal -->
@@ -270,7 +298,7 @@ try {
                                 <tr>
                                     <td><?php echo htmlspecialchars($row['name']); ?></td>
                                     <td><?php echo htmlspecialchars($row['description']); ?></td>
-                                    <td>Rp <?php echo number_format($row['price_per_day'], 0, ',', '.'); ?></td>
+                                    <td>Rp <?php echo $fine_data ? number_format($fine_data['amount'], 0, ',', '.') : '0'; ?></td>
                                     <td>
                                         <span class="badge <?php echo $row['status'] == 'available' ? 'bg-success' : 'bg-warning'; ?>">
                                             <?php echo $row['status'] == 'available' ? 'Tersedia' : 'Disewa'; ?>

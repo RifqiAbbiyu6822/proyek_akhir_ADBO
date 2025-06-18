@@ -38,6 +38,31 @@ try {
     } catch (Exception $e) {
         throw $e;
     }
+
+    // Proses pembayaran denda oleh user
+    if (isset($_POST['pay_fine'])) {
+        $fine_id = isset($_POST['fine_id']) ? (int)$_POST['fine_id'] : 0;
+        if ($fine_id < 1) {
+            $error_message = "ID denda tidak valid.";
+        } else {
+            try {
+                // Pastikan denda milik user dan status pending
+                $stmt = $db->prepare("SELECT * FROM fines f JOIN rentals r ON f.rental_id = r.id WHERE f.id = ? AND r.user_id = ?");
+                $stmt->execute([$fine_id, $_SESSION['user_id']]);
+                $fine_row = $stmt->fetch(PDO::FETCH_ASSOC);
+                if (!$fine_row) {
+                    $error_message = "Denda tidak ditemukan atau bukan milik Anda.";
+                } elseif ($fine_row['status'] !== 'pending') {
+                    $error_message = "Denda sudah dibayar atau tidak bisa dibayar.";
+                } else {
+                    $fine->updateStatus($fine_id, 'paid');
+                    $success_message = "Denda berhasil dibayar!";
+                }
+            } catch (Exception $e) {
+                $error_message = "Gagal membayar denda: " . htmlspecialchars($e->getMessage());
+            }
+        }
+    }
 } catch (Exception $e) {
     error_log("Dashboard error: " . $e->getMessage());
     $error_message = "Terjadi kesalahan saat memuat data. Silakan coba lagi nanti.";
@@ -165,6 +190,12 @@ try {
                                                 <span class="badge bg-<?php echo $row['status'] === 'paid' ? 'success' : 'warning'; ?>">
                                                     <?php echo htmlspecialchars($row['status']); ?>
                                                 </span>
+                                                <?php if ($row['status'] == 'pending'): ?>
+                                                    <form method="post" style="display:inline;">
+                                                        <input type="hidden" name="fine_id" value="<?php echo $row['id']; ?>">
+                                                        <button type="submit" name="pay_fine" class="btn btn-success btn-sm">Bayar Denda</button>
+                                                    </form>
+                                                <?php endif; ?>
                                             </td>
                                             <td><?php echo htmlspecialchars($row['description'] ?? '-'); ?></td>
                                         </tr>
