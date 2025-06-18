@@ -16,33 +16,23 @@ $rental = new Rental($db);
 $fine = new Fine($db);
 $lens = new Lens($db);
 
-// Get overdue rentals for fine calculation
-$overdue_rentals = false;
-$overdue_rentals_error = '';
-try {
-    $overdue_rentals = $rental->getOverdueRentals();
-} catch (Exception $e) {
-    $overdue_rentals_error = $e->getMessage();
-}
-$all_lenses = $lens->readAll();
+$success_message = '';
+$error_message = '';
 
 // Process fine creation
 if (isset($_POST['create_fine'])) {
     $rental_id = $_POST['rental_id'];
     $amount = $_POST['fine_amount'];
-    
     if ($fine->create($rental_id, $amount)) {
         $success_message = "Denda berhasil dibuat!";
     } else {
         $error_message = "Gagal membuat denda!";
     }
 }
-
 // Process lens return
 if (isset($_POST['return_lens'])) {
     $rental_id = $_POST['rental_id'];
     $lens_id = $_POST['lens_id'];
-    
     $db->beginTransaction();
     try {
         if ($rental->returnLens($rental_id) && $lens->updateStatus($lens_id, 'available')) {
@@ -55,6 +45,20 @@ if (isset($_POST['return_lens'])) {
         $db->rollback();
         $error_message = "Terjadi kesalahan: " . $e->getMessage();
     }
+}
+
+$overdue_rentals = false;
+$overdue_rentals_error = '';
+try {
+    $overdue_rentals = $rental->getOverdueRentals();
+} catch (Exception $e) {
+    $overdue_rentals_error = $e->getMessage();
+}
+$all_lenses = false;
+try {
+    $all_lenses = $lens->readAll();
+} catch (Exception $e) {
+    $error_message = $e->getMessage();
 }
 ?>
 <!DOCTYPE html>
