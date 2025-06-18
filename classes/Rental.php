@@ -65,6 +65,9 @@ class Rental {
         } catch (PDOException $e) {
             error_log("Error creating rental: " . $e->getMessage());
             throw new Exception("Gagal membuat penyewaan");
+        } catch (Exception $e) {
+            // Re-throw custom exceptions
+            throw $e;
         }
     }
 
@@ -97,6 +100,8 @@ class Rental {
 
     public function getOverdueRentals() {
         try {
+            // Get ALL active rentals, not just overdue ones
+            // The admin dashboard will determine which ones are overdue
             $query = "SELECT r.*, u.name as user_name, u.email, l.name as lens_name
                       FROM rentals r
                       JOIN users u ON r.user_id = u.id
@@ -107,7 +112,7 @@ class Rental {
             $stmt->execute();
             return $stmt;
         } catch (PDOException $e) {
-            error_log('Error getting overdue rentals: ' . $e->getMessage());
+            error_log('Error getting active rentals: ' . $e->getMessage());
             throw new Exception('Gagal mengambil data penyewaan aktif');
         }
     }
@@ -123,4 +128,4 @@ class Rental {
         }
     }
 }
-?> 
+?>

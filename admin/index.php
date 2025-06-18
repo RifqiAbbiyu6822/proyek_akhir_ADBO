@@ -121,18 +121,18 @@ try {
     <div class="container mt-4">
         <h2>Admin Dashboard</h2>
         
-        <?php if (isset($success_message)): ?>
+        <?php if ($success_message): ?>
             <div class="alert alert-success"><?php echo $success_message; ?></div>
         <?php endif; ?>
         
-        <?php if (isset($error_message)): ?>
+        <?php if ($error_message): ?>
             <div class="alert alert-danger"><?php echo $error_message; ?></div>
         <?php endif; ?>
 
-        <!-- Overdue Rentals -->
+        <!-- Active/Overdue Rentals -->
         <div class="card mb-4">
             <div class="card-header">
-                <h5>Penyewaan Terlambat</h5>
+                <h5>Penyewaan Aktif & Terlambat</h5>
             </div>
             <div class="card-body">
                 <?php if ($overdue_rentals_error): ?>
@@ -145,46 +145,96 @@ try {
                                     <th>Penyewa</th>
                                     <th>Email</th>
                                     <th>Lensa</th>
+                                    <th>Tgl Sewa</th>
                                     <th>Tgl Kembali</th>
-                                    <th>Hari Terlambat</th>
+                                    <th>Status</th>
+                                    <th>Denda</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php while ($row = $overdue_rentals->fetch(PDO::FETCH_ASSOC)): 
-                                    $days_overdue = (strtotime('now') - strtotime($row['return_date'])) / (60*60*24);
-                                    $days_overdue = floor($days_overdue);
-                                    if ($days_overdue < 1) $days_overdue = 0;
+                                    $return_date = strtotime($row['return_date']);
+                                    $today = strtotime(date('Y-m-d'));
+                                    $is_overdue = $today > $return_date;
+                                    $days_overdue = $is_overdue ? floor(($today - $return_date) / (60*60*24)) : 0;
+                                    
+                                    // Check for existing fine
+                                    $stmt_fine = $db->prepare("SELECT * FROM fines WHERE rental_id = ?");
+                                    $stmt_fine->execute([$row['id']]);
+                                    $fine_data = $stmt_fine->fetch(PDO::FETCH_ASSOC);
                                 ?>
-                                <tr>
+                                <tr class="<?php echo $is_overdue ? 'table-warning' : ''; ?>">
                                     <td><?php echo htmlspecialchars($row['user_name']); ?></td>
                                     <td><?php echo htmlspecialchars($row['email']); ?></td>
                                     <td><?php echo htmlspecialchars($row['lens_name']); ?></td>
+                                    <td><?php echo date('d/m/Y', strtotime($row['rental_date'])); ?></td>
                                     <td><?php echo date('d/m/Y', strtotime($row['return_date'])); ?></td>
-                                    <td><span class="badge bg-danger"><?php echo $days_overdue; ?> hari</span></td>
+                                    <td>
+                                        <?php if ($is_overdue): ?>
+                                            <span class="badge bg-danger"><?php echo $days_overdue; ?> hari terlambat</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-success">Aktif</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <?php if ($fine_data): ?>
+                                            <span class="badge <?php echo $fine_data['status'] == 'paid' ? 'bg-success' : 'bg-warning'; ?>">
+                                                Rp <?php echo number_format($fine_data['amount'], 0, ',', '.'); ?> 
+                                                (<?php echo $fine_data['status'] == 'paid' ? 'Lunas' : 'Belum Bayar'; ?>)
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="badge bg-secondary">Belum ada</span>
+                                        <?php endif; ?>
+                                    </td>
                                     <td>
                                         <div class="btn-group" role="group">
+                                            <!-- Fine Actions -->
+                                            <?php if ($fine_data && $fine_data['status'] == 'pending'): ?>
+                                                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" 
+                                                        data-bs-target="#payFineModal<?php echo $row['id']; ?>">
+                                                    Bayar Denda
+                                                </button>
+                                            <?php elseif (!$fine_data && $is_overdue): ?>
+                                                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" 
+                                                        data-bs-target="#fineModal<?php echo $row['id']; ?>">
+                                                    Buat Denda
+                                                </button>
+                                            <?php endif; ?>
+                                            
                                             <!-- Return Lens Button -->
-                                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" 
-                                                    data-bs-target="#returnModal<?php echo $row['id']; ?>">
-                                                Kembalikan
-                                            </button>
-                                            <!-- Fine Button -->
-                                            <?php
-                                            $has_fine = false;
-                                            $stmt_fine = $db->prepare("SELECT amount, status FROM fines WHERE rental_id = ?");
-                                            $stmt_fine->execute([$row['id']]);
-                                            $fine_data = $stmt_fine->fetch(PDO::FETCH_ASSOC);
-                                            if ($fine_data) {
-                                                $has_fine = true;
-                                            }
-                                            ?>
-                                            <?php if (!$has_fine): ?>
-                                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#fineModal<?php echo $row['id']; ?>">
-                                                Buat Denda
-                                            </button>
+                                            <?php if (!$fine_data || $fine_data['status'] == 'paid'): ?>
+                                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" 
+                                                        data-bs-target="#returnModal<?php echo $row['id']; ?>">
+                                                    Kembalikan
+                                                </button>
                                             <?php endif; ?>
                                         </div>
+
+                                        <!-- Pay Fine Modal -->
+                                        <?php if ($fine_data && $fine_data['status'] == 'pending'): ?>
+                                        <div class="modal fade" id="payFineModal<?php echo $row['id']; ?>" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Konfirmasi Pembayaran Denda</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <form method="post">
+                                                        <div class="modal-body">
+                                                            <p>Konfirmasi pembayaran denda sebesar <strong>Rp <?php echo number_format($fine_data['amount'], 0, ',', '.'); ?></strong> 
+                                                            untuk <strong><?php echo htmlspecialchars($row['user_name']); ?></strong>?</p>
+                                                            <input type="hidden" name="fine_id" value="<?php echo $fine_data['id']; ?>">
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                            <button type="submit" name="pay_fine" class="btn btn-success">Konfirmasi Bayar</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <?php endif; ?>
 
                                         <!-- Return Modal -->
                                         <div class="modal fade" id="returnModal<?php echo $row['id']; ?>" tabindex="-1">
@@ -210,6 +260,7 @@ try {
                                         </div>
 
                                         <!-- Fine Modal -->
+                                        <?php if (!$fine_data && $is_overdue): ?>
                                         <div class="modal fade" id="fineModal<?php echo $row['id']; ?>" tabindex="-1">
                                             <div class="modal-dialog">
                                                 <div class="modal-content">
@@ -250,6 +301,7 @@ try {
                                                 </div>
                                             </div>
                                         </div>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                                 <?php endwhile; ?>
@@ -257,7 +309,7 @@ try {
                         </table>
                     </div>
                 <?php else: ?>
-                    <p class="text-success">Tidak ada penyewaan yang terlambat.</p>
+                    <p class="text-success">Tidak ada penyewaan aktif saat ini.</p>
                 <?php endif; ?>
             </div>
         </div>
@@ -284,7 +336,7 @@ try {
                                 <tr>
                                     <td><?php echo htmlspecialchars($row['name']); ?></td>
                                     <td><?php echo htmlspecialchars($row['description']); ?></td>
-                                    <td>Rp <?php echo $fine_data ? number_format($fine_data['amount'], 0, ',', '.') : '0'; ?></td>
+                                    <td>Rp <?php echo number_format($row['price_per_day'], 0, ',', '.'); ?></td>
                                     <td>
                                         <span class="badge <?php echo $row['status'] == 'available' ? 'bg-success' : 'bg-warning'; ?>">
                                             <?php echo $row['status'] == 'available' ? 'Tersedia' : 'Disewa'; ?>
@@ -339,5 +391,3 @@ try {
     </script>
 </body>
 </html>
-
-<?php
