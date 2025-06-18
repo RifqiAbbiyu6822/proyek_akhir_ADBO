@@ -161,13 +161,22 @@ if (isset($_POST['return_lens'])) {
                                                             <p>Buat denda untuk <strong><?php echo htmlspecialchars($row['user_name']); ?></strong></p>
                                                             <div class="mb-3">
                                                                 <label for="fine_days_<?php echo $row['id']; ?>" class="form-label">Hari Keterlambatan</label>
-                                                                <input type="number" class="form-control" name="fine_days" id="fine_days_<?php echo $row['id']; ?>" value="<?php echo $days_overdue; ?>" min="1" required>
+                                                                <input type="number" class="form-control fine-days" name="fine_days" id="fine_days_<?php echo $row['id']; ?>" value="<?php echo $days_overdue; ?>" min="1" required>
                                                             </div>
                                                             <div class="mb-3">
-                                                                <label for="fine_amount" class="form-label">Jumlah Denda (Rp)</label>
-                                                                <input type="number" class="form-control" name="fine_amount" value="<?php echo $days_overdue * 10000; ?>" required>
+                                                                <label for="damage_type_<?php echo $row['id']; ?>" class="form-label">Jenis Kerusakan</label>
+                                                                <select class="form-select damage-type" name="damage_type" id="damage_type_<?php echo $row['id']; ?>">
+                                                                    <option value="none" selected>Tidak Ada</option>
+                                                                    <option value="ringan">Ringan (+Rp 20.000)</option>
+                                                                    <option value="sedang">Sedang (+Rp 50.000)</option>
+                                                                    <option value="berat">Berat (+Rp 100.000)</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label for="fine_amount_<?php echo $row['id']; ?>" class="form-label">Jumlah Denda (Rp)</label>
+                                                                <input type="number" class="form-control fine-amount" name="fine_amount" id="fine_amount_<?php echo $row['id']; ?>" value="<?php echo $days_overdue * 10000; ?>" required>
                                                                 <small class="form-text text-muted">
-                                                                    Saran: Rp <?php echo number_format($days_overdue * 10000, 0, ',', '.'); ?> (<?php echo $days_overdue; ?> hari × Rp 10.000)
+                                                                    Saran: Rp <span class="fine-suggestion"><?php echo number_format($days_overdue * 10000, 0, ',', '.'); ?></span> (<?php echo $days_overdue; ?> hari × Rp 10.000 + denda kerusakan)
                                                                 </small>
                                                             </div>
                                                             <input type="hidden" name="rental_id" value="<?php echo $row['id']; ?>">
@@ -229,6 +238,32 @@ if (isset($_POST['return_lens'])) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('fineModal<?php echo $row['id']; ?>');
+        if (!modal) return;
+        const fineDays = modal.querySelector('.fine-days');
+        const damageType = modal.querySelector('.damage-type');
+        const fineAmount = modal.querySelector('.fine-amount');
+        const fineSuggestion = modal.querySelector('.fine-suggestion');
+        function updateFine() {
+            let days = parseInt(fineDays.value) || 0;
+            let base = days * 10000;
+            let damage = 0;
+            switch (damageType.value) {
+                case 'ringan': damage = 20000; break;
+                case 'sedang': damage = 50000; break;
+                case 'berat': damage = 100000; break;
+                default: damage = 0;
+            }
+            let total = base + damage;
+            fineAmount.value = total;
+            fineSuggestion.textContent = total.toLocaleString('id-ID');
+        }
+        fineDays.addEventListener('input', updateFine);
+        damageType.addEventListener('change', updateFine);
+    });
+    </script>
 </body>
 </html>
 
