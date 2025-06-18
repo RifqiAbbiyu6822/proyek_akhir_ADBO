@@ -53,16 +53,10 @@ class Fine {
                 throw new Exception("Denda untuk penyewaan ini sudah ada");
             }
 
-            // Create fine
-            if ($description !== null) {
-                $query = "INSERT INTO " . $this->table_name . " (rental_id, amount, status, description) VALUES (?, ?, 'pending', ?)";
-                $stmt = $this->conn->prepare($query);
-                return $stmt->execute([$rental_id, $amount, $description]);
-            } else {
-                $query = "INSERT INTO " . $this->table_name . " (rental_id, amount, status) VALUES (?, ?, 'pending')";
-                $stmt = $this->conn->prepare($query);
-                return $stmt->execute([$rental_id, $amount]);
-            }
+            // Create fine (tanpa description)
+            $query = "INSERT INTO " . $this->table_name . " (rental_id, amount, status) VALUES (?, ?, 'pending')";
+            $stmt = $this->conn->prepare($query);
+            return $stmt->execute([$rental_id, $amount]);
         } catch (PDOException $e) {
             error_log("Error creating fine: " . $e->getMessage());
             throw new Exception("Gagal membuat denda");
