@@ -23,6 +23,8 @@ class Fine {
             
             return $stmt;
         } catch (PDOException $e) {
+            // Tampilkan error detail
+            echo '<b>PDO Error (getUserFines):</b> ' . $e->getMessage() . '<br>';
             error_log("Error getting user fines: " . $e->getMessage());
             throw new Exception("Gagal mengambil data denda");
         }
