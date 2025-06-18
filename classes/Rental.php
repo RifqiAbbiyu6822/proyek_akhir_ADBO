@@ -101,14 +101,14 @@ class Rental {
                       FROM rentals r
                       JOIN users u ON r.user_id = u.id
                       JOIN lenses l ON r.lens_id = l.id
-                      WHERE r.status = 'active' AND r.return_date < CURDATE()
+                      WHERE r.status = 'active'
                       ORDER BY r.return_date ASC";
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
             return $stmt;
         } catch (PDOException $e) {
             error_log('Error getting overdue rentals: ' . $e->getMessage());
-            throw new Exception('Gagal mengambil data penyewaan terlambat');
+            throw new Exception('Gagal mengambil data penyewaan aktif');
         }
     }
 }
