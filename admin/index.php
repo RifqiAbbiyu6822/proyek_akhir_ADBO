@@ -320,32 +320,36 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const modal = document.getElementById('fineModal<?php echo $row['id']; ?>');
-        if (!modal) return;
-        const fineDays = modal.querySelector('.fine-days');
-        const damageType = modal.querySelector('.damage-type');
-        const fineAmount = modal.querySelector('.fine-amount');
-        const fineSuggestion = modal.querySelector('.fine-suggestion');
-        function updateFine() {
-            let days = parseInt(fineDays.value) || 1;
-            if (days < 1) {
-                days = 1;
-                fineDays.value = 1;
+        // Untuk semua modal denda
+        document.querySelectorAll('.modal').forEach(function(modal) {
+            const fineDays = modal.querySelector('.fine-days');
+            const damageType = modal.querySelector('.damage-type');
+            const fineAmount = modal.querySelector('.fine-amount');
+            const fineSuggestion = modal.querySelector('.fine-suggestion');
+            if (!fineDays || !damageType || !fineAmount || !fineSuggestion) return;
+            function updateFine() {
+                let days = parseInt(fineDays.value) || 1;
+                if (days < 1) {
+                    days = 1;
+                    fineDays.value = 1;
+                }
+                let base = days * 10000;
+                let damage = 0;
+                switch (damageType.value) {
+                    case 'ringan': damage = 20000; break;
+                    case 'sedang': damage = 50000; break;
+                    case 'berat': damage = 100000; break;
+                    default: damage = 0;
+                }
+                let total = base + damage;
+                fineAmount.value = total;
+                fineSuggestion.textContent = total.toLocaleString('id-ID');
             }
-            let base = days * 10000;
-            let damage = 0;
-            switch (damageType.value) {
-                case 'ringan': damage = 20000; break;
-                case 'sedang': damage = 50000; break;
-                case 'berat': damage = 100000; break;
-                default: damage = 0;
-            }
-            let total = base + damage;
-            fineAmount.value = total;
-            fineSuggestion.textContent = total.toLocaleString('id-ID');
-        }
-        fineDays.addEventListener('input', updateFine);
-        damageType.addEventListener('change', updateFine);
+            fineDays.addEventListener('input', updateFine);
+            damageType.addEventListener('change', updateFine);
+            // Inisialisasi saat modal dibuka
+            modal.addEventListener('shown.bs.modal', updateFine);
+        });
     });
     </script>
 </body>
