@@ -50,8 +50,134 @@ $csrf_token = generateCSRFToken();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Lens Rental</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2922/2922017.png">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --accent: #38bdf8;
+            --bg: #f8fafc;
+            --card-bg: #fff;
+            --text: #222;
+            --border: #e5e7eb;
+            --shadow: 0 2px 16px rgba(0,0,0,0.06);
+        }
+        [data-theme="dark"] {
+            --primary: #60a5fa;
+            --primary-dark: #2563eb;
+            --accent: #38bdf8;
+            --bg: #181a20;
+            --card-bg: #23262f;
+            --text: #f3f4f6;
+            --border: #2d2f36;
+            --shadow: 0 2px 16px rgba(0,0,0,0.18);
+        }
+        html, body {
+            font-family: 'Inter', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            background: var(--primary-dark) !important;
+            box-shadow: var(--shadow);
+        }
+        .navbar .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .navbar .nav-link:hover {
+            color: var(--accent) !important;
+        }
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.3em;
+            margin-left: 1rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .theme-toggle:hover {
+            color: var(--accent);
+        }
+        .card {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            background: var(--card-bg);
+        }
+        .card-header {
+            background: var(--card-bg);
+            border-bottom: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+        }
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--accent);
+        }
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary-dark);
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary);
+        }
+        .alert {
+            border-radius: 8px;
+        }
+        @media (max-width: 576px) {
+            .card {
+                border-radius: 10px;
+            }
+        }
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background: var(--card-bg);
+            color: var(--text);
+            text-align: center;
+            padding: 16px 0 8px 0;
+            border-top: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+        body {
+            padding-bottom: 60px; /* Height of footer */
+        }
+        @media (max-width: 576px) {
+            .footer {
+                padding: 10px 0 6px 0;
+            }
+        }
+    </style>
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.php">LensRental</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="login.php">Login</a>
+                <a class="nav-link" href="register.php">Register</a>
+                <button class="theme-toggle" id="themeToggle" title="Toggle dark mode"><i class="fa fa-moon"></i></button>
+            </div>
+        </div>
+    </nav>
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-6">
@@ -100,7 +226,37 @@ $csrf_token = generateCSRFToken();
             </div>
         </div>
     </div>
+    <footer class="footer mt-auto">
+        <div class="container">
+            <span>&copy; <?php echo date('Y'); ?> LensRental. All rights reserved.</span>
+        </div>
+    </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+    // Dark mode toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    function setTheme(theme) {
+        html.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        themeToggle.innerHTML = theme === 'dark' ? '<i class="fa fa-sun"></i>' : '<i class="fa fa-moon"></i>';
+    }
+    themeToggle.addEventListener('click', function() {
+        const current = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        setTheme(current);
+    });
+    (function() {
+        const saved = localStorage.getItem('theme');
+        if (saved) {
+            setTheme(saved);
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            setTheme('dark');
+        } else {
+            setTheme('light');
+        }
+    })();
+    </script>
 </body>
 </html>
 
