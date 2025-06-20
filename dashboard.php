@@ -112,298 +112,288 @@ try {
     <title>Dashboard - Lens Rental</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="includes/vintage-theme.css">
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2922/2922017.png">
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1e40af;
-            --accent: #38bdf8;
-            --bg: #f8fafc;
-            --card-bg: #fff;
-            --text: #222;
-            --border: #e5e7eb;
-            --shadow: 0 2px 16px rgba(0,0,0,0.06);
-        }
-        [data-theme="dark"] {
-            --primary: #60a5fa;
-            --primary-dark: #2563eb;
-            --accent: #38bdf8;
-            --bg: #181a20;
-            --card-bg: #23262f;
-            --text: #f3f4f6;
-            --border: #2d2f36;
-            --shadow: 0 2px 16px rgba(0,0,0,0.18);
-        }
-        html, body {
-            font-family: 'Inter', Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-        }
-        .navbar {
-            position: sticky;
-            top: 0;
-            z-index: 1030;
-            background: var(--primary-dark) !important;
-            box-shadow: var(--shadow);
-        }
-        .navbar .nav-link {
-            color: #fff !important;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-        .navbar .nav-link:hover {
-            color: var(--accent) !important;
-        }
-        .theme-toggle {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 1.3em;
-            margin-left: 1rem;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .theme-toggle:hover {
-            color: var(--accent);
-        }
-        .card {
-            background: var(--card-bg);
-            box-shadow: var(--shadow);
-            border-radius: 16px;
-            border: 1px solid var(--border);
-        }
-        .card-header {
-            border-radius: 16px 16px 0 0 !important;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-        .table {
-            background: transparent;
-        }
-        .table th, .table td {
-            vertical-align: middle;
-            border-color: var(--border) !important;
-        }
-        .table-hover tbody tr:hover {
-            background: var(--accent) !important;
-            color: #fff;
-            transition: background 0.2s, color 0.2s;
-        }
-        .badge {
-            font-size: 0.95em;
-            padding: 0.5em 0.8em;
-            border-radius: 8px;
-            font-weight: 600;
-        }
-        .btn {
-            border-radius: 8px;
-            font-weight: 600;
-            letter-spacing: 0.2px;
-            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-        }
-        .btn-primary {
-            background: var(--primary);
-            border-color: var(--primary-dark);
-        }
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            border-color: var(--primary);
-        }
-        .btn-info {
-            background: var(--accent);
-            border: none;
-            color: #fff;
-        }
-        .btn-info:hover {
-            background: #0ea5e9;
-        }
-        @media (max-width: 576px) {
-            .card {
-                border-radius: 10px;
-            }
-            .main-content {
-                padding: 0 0.5rem;
-            }
-            .footer {
-                padding: 10px 0 6px 0;
-            }
-        }
-        .footer {
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background: var(--card-bg);
-            color: var(--text);
-            text-align: center;
-            padding: 16px 0 8px 0;
-            border-top: 1px solid var(--border);
-            box-shadow: var(--shadow);
-        }
-        body {
-            padding-bottom: 60px; /* Height of footer */
-        }
-    </style>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="index.php">LensRental</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.php">Beranda</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="dashboard.php">Dashboard</a>
-                    </li>
-                    <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 4): ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="admin/index.php">Admin Panel</a>
-                    </li>
-                    <?php endif; ?>
-                </ul>
-                <div class="navbar-nav">
-                    <span class="nav-link">Halo, <?php echo htmlspecialchars($user['name']); ?>!</span>
-                    <a class="nav-link" href="logout.php">Logout</a>
-                    <button class="theme-toggle" id="themeToggle" title="Toggle dark mode"><i class="fa fa-moon"></i></button>
-                </div>
+            <a class="navbar-brand" href="index.php">
+                <i class="fas fa-camera-retro me-2"></i>LensRental
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="dashboard.php">
+                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                </a>
+                <a class="nav-link" href="index.php">
+                    <i class="fas fa-home me-1"></i>Home
+                </a>
+                <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 4): ?>
+                    <a class="nav-link" href="admin/index.php">
+                        <i class="fas fa-cog me-1"></i>Admin Panel
+                    </a>
+                <?php endif; ?>
+                <a class="nav-link" href="logout.php">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </a>
+                <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">
+                    <i class="fa fa-moon"></i>
+                </button>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <!-- Main Content -->
+    <div class="container py-4">
         <?php if (isset($error_message)): ?>
-            <div class="alert alert-danger"><?php echo htmlspecialchars($error_message); ?></div>
-        <?php else: ?>
-            <h2>Dashboard</h2>
-            
-            <!-- Active Rentals -->
-            <div class="card mb-4">
-                <?php if ($_SESSION['user_id'] != 4): ?>
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">Penyewaan Aktif</h4>
-                    <a href="index.php" class="btn btn-primary btn-sm">
-                        <i class="bi bi-plus-circle"></i> Sewa Baru
-                    </a>
+            <div class="alert alert-danger fade-in">
+                <i class="fas fa-exclamation-triangle me-2"></i><?php echo htmlspecialchars($error_message); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($success_message)): ?>
+            <div class="alert alert-success fade-in">
+                <i class="fas fa-check-circle me-2"></i><?php echo htmlspecialchars($success_message); ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Welcome Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card slide-in-left">
+                    <div class="card-body text-center">
+                        <h2 class="card-title">
+                            <i class="fas fa-user-circle me-3"></i>Selamat Datang, <?php echo htmlspecialchars($user['name']); ?>!
+                        </h2>
+                        <p class="card-text text-muted">Kelola penyewaan lensa Anda di sini</p>
+                    </div>
                 </div>
-                <?php else: ?>
-                <div class="card-header">
-                    <h4 class="mb-0">Penyewaan Aktif</h4>
-                    <span class="badge bg-info">Admin tidak dapat menyewa lensa</span>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="card text-center slide-in-left">
+                    <div class="card-body">
+                        <i class="fas fa-camera fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Total Penyewaan</h5>
+                        <p class="price-display"><?php echo count($user_rentals); ?></p>
+                    </div>
                 </div>
-                <?php endif; ?>
-                <div class="card-body">
-                    <?php
-                    $user_rentals->execute();
-                    $active_rows = [];
-                    while ($row = $user_rentals->fetch(PDO::FETCH_ASSOC)) {
-                        if ($row['status'] === 'active') {
-                            $active_rows[] = $row;
-                        }
-                    }
-                    ?>
-                    <?php if (count($active_rows) > 0): ?>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-center slide-in-left">
+                    <div class="card-body">
+                        <i class="fas fa-money-bill-wave fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">Total Tagihan</h5>
+                        <p class="price-display"><?php echo number_format($total_tagihan, 0, ',', '.'); ?></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-center slide-in-left">
+                    <div class="card-body">
+                        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                        <h5 class="card-title">Total Denda</h5>
+                        <p class="price-display"><?php echo number_format($total_fine, 0, ',', '.'); ?></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Rentals -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card slide-in-right">
+                    <div class="card-header">
+                        <h4 class="mb-0">
+                            <i class="fas fa-clock me-2"></i>Penyewaan Aktif
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <?php if (empty($user_rentals)): ?>
+                            <div class="text-center py-4">
+                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">Tidak ada penyewaan aktif saat ini.</p>
+                                <a href="index.php" class="btn btn-primary">
+                                    <i class="fas fa-camera me-2"></i>Sewa Lensa
+                                </a>
+                            </div>
+                        <?php else: ?>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Lensa</th>
+                                            <th>Tanggal Sewa</th>
+                                            <th>Tanggal Kembali</th>
+                                            <th>Durasi</th>
+                                            <th>Total Harga</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($user_rentals as $rental): ?>
+                                        <tr>
+                                            <td>
+                                                <i class="fas fa-camera me-2"></i>
+                                                <?php echo htmlspecialchars($rental['lens_name']); ?>
+                                            </td>
+                                            <td><?php echo date('d/m/Y', strtotime($rental['rental_date'])); ?></td>
+                                            <td><?php echo date('d/m/Y', strtotime($rental['return_date'])); ?></td>
+                                            <td><?php echo $rental['duration']; ?> hari</td>
+                                            <td class="price-display"><?php echo number_format($rental['total_price'], 0, ',', '.'); ?></td>
+                                            <td>
+                                                <span class="badge badge-success">
+                                                    <i class="fas fa-check-circle me-1"></i>Aktif
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rental History -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card slide-in-right">
+                    <div class="card-header">
+                        <h4 class="mb-0">
+                            <i class="fas fa-history me-2"></i>Riwayat Penyewaan
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <?php if (empty($user_rental_history)): ?>
+                            <div class="text-center py-4">
+                                <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">Belum ada riwayat penyewaan.</p>
+                            </div>
+                        <?php else: ?>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Lensa</th>
+                                            <th>Tanggal Sewa</th>
+                                            <th>Tanggal Kembali</th>
+                                            <th>Durasi</th>
+                                            <th>Total Harga</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($user_rental_history as $rental): ?>
+                                        <tr>
+                                            <td>
+                                                <i class="fas fa-camera me-2"></i>
+                                                <?php echo htmlspecialchars($rental['lens_name']); ?>
+                                            </td>
+                                            <td><?php echo date('d/m/Y', strtotime($rental['rental_date'])); ?></td>
+                                            <td><?php echo date('d/m/Y', strtotime($rental['return_date'])); ?></td>
+                                            <td><?php echo $rental['duration']; ?> hari</td>
+                                            <td class="price-display"><?php echo number_format($rental['total_price'], 0, ',', '.'); ?></td>
+                                            <td>
+                                                <span class="badge badge-info">
+                                                    <i class="fas fa-check me-1"></i>Selesai
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fines Section -->
+        <?php if (!empty($user_fines_data)): ?>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card slide-in-right">
+                    <div class="card-header">
+                        <h4 class="mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Denda
+                        </h4>
+                    </div>
+                    <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
                                         <th>Lensa</th>
-                                        <th>Tanggal Sewa</th>
-                                        <th>Tanggal Kembali</th>
+                                        <th>Alasan</th>
+                                        <th>Jumlah Denda</th>
                                         <th>Status</th>
-                                        <th>Total Biaya</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($active_rows as $row): ?>
-                                        <tr>
-                                            <td><?php echo htmlspecialchars($row['lens_name']); ?></td>
-                                            <td><?php echo date('d/m/Y', strtotime($row['rental_date'])); ?></td>
-                                            <td><?php echo date('d/m/Y', strtotime($row['return_date'])); ?></td>
-                                            <td>
-                                                <span class="badge bg-success">Aktif</span>
-                                            </td>
-                                            <td>Rp <?php echo number_format($row['total_price'], 0, ',', '.'); ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    <?php else: ?>
-                        <p class="text-muted">Tidak ada penyewaan aktif.</p>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <div class="alert alert-info mt-3">
-                <strong>Total Tagihan Anda:</strong> Rp <?php echo number_format($total_tagihan, 0, ',', '.'); ?>
-                <br><small>(Total harga penyewaan: Rp <?php echo number_format($total_rental, 0, ',', '.'); ?>, Total denda: Rp <?php echo number_format($total_fine, 0, ',', '.'); ?>)</small>
-            </div>
-
-            <!-- Rental History -->
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h4 class="mb-0">Riwayat Penyewaan</h4>
-                </div>
-                <div class="card-body">
-                    <?php
-                    $user_rental_history->execute();
-                    $history_rows = [];
-                    while ($row = $user_rental_history->fetch(PDO::FETCH_ASSOC)) {
-                        $history_rows[] = $row;
-                    }
-                    ?>
-                    <?php if (count($history_rows) > 0): ?>
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
+                                    <?php foreach ($user_fines_data as $fine): ?>
                                     <tr>
-                                        <th>Lensa</th>
-                                        <th>Tanggal Sewa</th>
-                                        <th>Tanggal Kembali</th>
-                                        <th>Status</th>
-                                        <th>Total Biaya</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($history_rows as $row): ?>
-                                        <tr>
-                                            <td><?php echo htmlspecialchars($row['lens_name']); ?></td>
-                                            <td><?php echo date('d/m/Y', strtotime($row['rental_date'])); ?></td>
-                                            <td><?php echo date('d/m/Y', strtotime($row['return_date'])); ?></td>
-                                            <td>
-                                                <span class="badge bg-<?php echo $row['status'] === 'active' ? 'success' : 'secondary'; ?>">
-                                                    <?php echo htmlspecialchars($row['status']); ?>
+                                        <td>
+                                            <i class="fas fa-camera me-2"></i>
+                                            <?php echo htmlspecialchars($fine['lens_name']); ?>
+                                        </td>
+                                        <td><?php echo htmlspecialchars($fine['reason']); ?></td>
+                                        <td class="price-display"><?php echo number_format($fine['amount'], 0, ',', '.'); ?></td>
+                                        <td>
+                                            <?php if ($fine['status'] === 'pending'): ?>
+                                                <span class="badge badge-warning">
+                                                    <i class="fas fa-clock me-1"></i>Pending
                                                 </span>
-                                            </td>
-                                            <td>Rp <?php echo number_format($row['total_price'], 0, ',', '.'); ?></td>
-                                        </tr>
+                                            <?php else: ?>
+                                                <span class="badge badge-success">
+                                                    <i class="fas fa-check me-1"></i>Dibayar
+                                                </span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php if ($fine['status'] === 'pending'): ?>
+                                                <form method="POST" style="display: inline;">
+                                                    <input type="hidden" name="fine_id" value="<?php echo $fine['id']; ?>">
+                                                    <button type="submit" name="pay_fine" class="btn btn-success btn-sm">
+                                                        <i class="fas fa-credit-card me-1"></i>Bayar
+                                                    </button>
+                                                </form>
+                                            <?php else: ?>
+                                                <span class="text-muted">Sudah dibayar</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>
-                    <?php else: ?>
-                        <p class="text-muted">Belum ada riwayat penyewaan.</p>
-                    <?php endif; ?>
+                    </div>
                 </div>
             </div>
+        </div>
         <?php endif; ?>
     </div>
 
     <footer class="footer mt-auto">
         <div class="container">
-            <span>&copy; <?php echo date('Y'); ?> LensRental. All rights reserved.</span>
+            <div class="row">
+                <div class="col-md-6">
+                    <span>&copy; <?php echo date('Y'); ?> LensRental. All rights reserved.</span>
+                </div>
+                <div class="col-md-6 text-end">
+                    <span>Made with <i class="fas fa-heart text-danger"></i> for photographers</span>
+                </div>
+            </div>
         </div>
     </footer>
-
-    <?php include 'includes/footer.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
@@ -411,15 +401,18 @@ try {
     // Dark mode toggle
     const themeToggle = document.getElementById('themeToggle');
     const html = document.documentElement;
+    
     function setTheme(theme) {
         html.setAttribute('data-theme', theme);
         localStorage.setItem('theme', theme);
         themeToggle.innerHTML = theme === 'dark' ? '<i class="fa fa-sun"></i>' : '<i class="fa fa-moon"></i>';
     }
+    
     themeToggle.addEventListener('click', function() {
         const current = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         setTheme(current);
     });
+    
     (function() {
         const saved = localStorage.getItem('theme');
         if (saved) {
@@ -430,6 +423,34 @@ try {
             setTheme('light');
         }
     })();
+
+    // Add scroll animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    // Observe all cards for animation
+    document.querySelectorAll('.card').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(card);
+    });
+
+    // Auto-refresh page after 30 seconds to update data
+    setTimeout(() => {
+        location.reload();
+    }, 30000);
     </script>
 </body>
 </html>

@@ -94,230 +94,155 @@ $csrf_token = generateCSRFToken();
     <title>Sewa Lensa - <?php echo htmlspecialchars($lens['name']); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="includes/vintage-theme.css">
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2922/2922017.png">
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1e40af;
-            --accent: #38bdf8;
-            --bg: #f8fafc;
-            --card-bg: #fff;
-            --text: #222;
-            --border: #e5e7eb;
-            --shadow: 0 2px 16px rgba(0,0,0,0.06);
-        }
-        [data-theme="dark"] {
-            --primary: #60a5fa;
-            --primary-dark: #2563eb;
-            --accent: #38bdf8;
-            --bg: #181a20;
-            --card-bg: #23262f;
-            --text: #f3f4f6;
-            --border: #2d2f36;
-            --shadow: 0 2px 16px rgba(0,0,0,0.18);
-        }
-        html, body {
-            font-family: 'Inter', Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-        }
-        .navbar {
-            position: sticky;
-            top: 0;
-            z-index: 1030;
-            background: var(--primary-dark) !important;
-            box-shadow: var(--shadow);
-        }
-        .navbar .nav-link {
-            color: #fff !important;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-        .navbar .nav-link:hover {
-            color: var(--accent) !important;
-        }
-        .theme-toggle {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 1.3em;
-            margin-left: 1rem;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .theme-toggle:hover {
-            color: var(--accent);
-        }
-        .card {
-            background: var(--card-bg);
-            box-shadow: var(--shadow);
-            border-radius: 16px;
-            border: 1px solid var(--border);
-        }
-        .card-header {
-            border-radius: 16px 16px 0 0 !important;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-        .table {
-            background: transparent;
-        }
-        .table th, .table td {
-            vertical-align: middle;
-            border-color: var(--border) !important;
-        }
-        .table-hover tbody tr:hover {
-            background: var(--accent) !important;
-            color: #fff;
-            transition: background 0.2s, color 0.2s;
-        }
-        .badge {
-            font-size: 0.95em;
-            padding: 0.5em 0.8em;
-            border-radius: 8px;
-            font-weight: 600;
-        }
-        .btn {
-            border-radius: 8px;
-            font-weight: 600;
-            letter-spacing: 0.2px;
-            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-        }
-        .btn-primary {
-            background: var(--primary);
-            border-color: var(--primary-dark);
-        }
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            border-color: var(--primary);
-        }
-        .btn-info {
-            background: var(--accent);
-            border: none;
-            color: #fff;
-        }
-        .btn-info:hover {
-            background: #0ea5e9;
-        }
-        @media (max-width: 576px) {
-            .card {
-                border-radius: 10px;
-            }
-            .main-content {
-                padding: 0 0.5rem;
-            }
-            .footer {
-                padding: 10px 0 6px 0;
-            }
-        }
-        .footer {
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background: var(--card-bg);
-            color: var(--text);
-            text-align: center;
-            padding: 16px 0 8px 0;
-            border-top: 1px solid var(--border);
-            box-shadow: var(--shadow);
-        }
-        body {
-            padding-bottom: 60px; /* Height of footer */
-        }
-    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="index.php">LensRental</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.php">Beranda</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="dashboard.php">Dashboard</a>
-                    </li>
-                    <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == 4): ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="admin/index.php">Admin Panel</a>
-                    </li>
-                    <?php endif; ?>
-                </ul>
-                <div class="navbar-nav">
-                    <a class="nav-link" href="logout.php">Logout</a>
-                    <button class="theme-toggle" id="themeToggle" title="Toggle dark mode"><i class="fa fa-moon"></i></button>
-                </div>
+            <a class="navbar-brand" href="index.php">
+                <i class="fas fa-camera-retro me-2"></i>LensRental
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="dashboard.php">
+                    <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                </a>
+                <a class="nav-link" href="index.php">
+                    <i class="fas fa-home me-1"></i>Home
+                </a>
+                <a class="nav-link" href="logout.php">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </a>
+                <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">
+                    <i class="fa fa-moon"></i>
+                </button>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card">
+    <!-- Main Content -->
+    <div class="container py-4">
+        <?php if ($error_message): ?>
+            <div class="alert alert-danger fade-in">
+                <i class="fas fa-exclamation-triangle me-2"></i><?php echo htmlspecialchars($error_message); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($success_message): ?>
+            <div class="alert alert-success fade-in">
+                <i class="fas fa-check-circle me-2"></i><?php echo htmlspecialchars($success_message); ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Lens Details -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card slide-in-left">
                     <div class="card-header">
-                        <h3>Sewa Lensa: <?php echo htmlspecialchars($lens['name']); ?></h3>
+                        <h4 class="mb-0">
+                            <i class="fas fa-camera me-2"></i>Detail Lensa
+                        </h4>
                     </div>
                     <div class="card-body">
-                        <?php if ($success_message): ?>
-                            <div class="alert alert-success">
-                                <i class="bi bi-check-circle"></i> <?php echo htmlspecialchars($success_message); ?>
+                        <div class="text-center mb-4">
+                            <i class="fas fa-camera fa-4x text-primary mb-3"></i>
+                            <h3 class="card-title"><?php echo htmlspecialchars($lens['name']); ?></h3>
+                        </div>
+                        <p class="card-text"><?php echo htmlspecialchars($lens['description']); ?></p>
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <div class="price-display mb-2"><?php echo number_format($lens['price_per_day'], 0, ',', '.'); ?></div>
+                                <small class="text-muted">per hari</small>
                             </div>
-                            <a href="dashboard.php" class="btn btn-primary">
-                                <i class="bi bi-speedometer2"></i> Lihat Dashboard
-                            </a>
-                        <?php else: ?>
-                            <?php if ($error_message): ?>
-                                <div class="alert alert-danger">
-                                    <i class="bi bi-exclamation-triangle"></i> <?php echo htmlspecialchars($error_message); ?>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <form method="post" id="rentalForm">
-                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
-                                <div class="mb-3">
-                                    <label for="rental_date" class="form-label">Tanggal Sewa</label>
-                                    <input type="date" class="form-control" id="rental_date" name="rental_date" 
-                                           min="<?php echo date('Y-m-d'); ?>" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="return_date" class="form-label">Tanggal Kembali</label>
-                                    <input type="date" class="form-control" id="return_date" name="return_date" 
-                                           min="<?php echo date('Y-m-d', strtotime('+1 day')); ?>" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-check-circle"></i> Konfirmasi Penyewaan
-                                </button>
-                                <a href="index.php" class="btn btn-secondary">
-                                    <i class="bi bi-x-circle"></i> Batal
-                                </a>
-                            </form>
-                        <?php endif; ?>
+                            <div class="col-6">
+                                <span class="badge badge-success">
+                                    <i class="fas fa-check-circle me-1"></i>Tersedia
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="col-md-4">
-                <div class="card">
+
+            <!-- Rental Form -->
+            <div class="col-md-6">
+                <div class="card slide-in-right">
                     <div class="card-header">
-                        <h5 class="mb-0">Detail Lensa</h5>
+                        <h4 class="mb-0">
+                            <i class="fas fa-calendar-alt me-2"></i>Form Penyewaan
+                        </h4>
                     </div>
                     <div class="card-body">
-                        <h6><?php echo htmlspecialchars($lens['name']); ?></h6>
-                        <p><?php echo htmlspecialchars($lens['description']); ?></p>
-                        <p><strong>Harga: Rp <?php echo number_format($lens['price_per_day'], 0, ',', '.'); ?>/hari</strong></p>
-                        <hr>
-                        <div id="priceCalculation">
-                            <p><strong>Estimasi Biaya:</strong></p>
-                            <p>Durasi: <span id="days">1</span> hari</p>
-                            <p>Total: <strong>Rp <span id="totalPrice"><?php echo number_format($lens['price_per_day'], 0, ',', '.'); ?></span></strong></p>
+                        <form method="POST" action="" id="rentalForm">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+                            
+                            <div class="mb-3">
+                                <label for="rental_date" class="form-label">
+                                    <i class="fas fa-calendar-plus me-2"></i>Tanggal Sewa
+                                </label>
+                                <input type="date" class="form-control" id="rental_date" name="rental_date" 
+                                       min="<?php echo date('Y-m-d'); ?>" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="return_date" class="form-label">
+                                    <i class="fas fa-calendar-minus me-2"></i>Tanggal Kembali
+                                </label>
+                                <input type="date" class="form-control" id="return_date" name="return_date" required>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <div class="card" style="background: var(--vintage-cream);">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-calculator me-2"></i>Perhitungan Biaya
+                                        </h6>
+                                        <div id="calculation" class="text-muted">
+                                            Pilih tanggal untuk melihat perhitungan
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-shopping-cart me-2"></i>Sewa Sekarang
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rental Terms -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card slide-in-left">
+                    <div class="card-header">
+                        <h4 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>Syarat dan Ketentuan
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-check-circle text-success me-2"></i>Yang Diperbolehkan:</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-arrow-right text-primary me-2"></i>Penggunaan lensa sesuai dengan petunjuk</li>
+                                    <li><i class="fas fa-arrow-right text-primary me-2"></i>Pemeliharaan lensa dengan baik</li>
+                                    <li><i class="fas fa-arrow-right text-primary me-2"></i>Pengembalian tepat waktu</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-times-circle text-danger me-2"></i>Yang Dilarang:</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-arrow-right text-warning me-2"></i>Menggunakan lensa di lingkungan berdebu</li>
+                                    <li><i class="fas fa-arrow-right text-warning me-2"></i>Membuka atau memperbaiki lensa</li>
+                                    <li><i class="fas fa-arrow-right text-warning me-2"></i>Keterlambatan pengembalian</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -327,65 +252,112 @@ $csrf_token = generateCSRFToken();
 
     <footer class="footer mt-auto">
         <div class="container">
-            <span>&copy; <?php echo date('Y'); ?> LensRental. All rights reserved.</span>
+            <div class="row">
+                <div class="col-md-6">
+                    <span>&copy; <?php echo date('Y'); ?> LensRental. All rights reserved.</span>
+                </div>
+                <div class="col-md-6 text-end">
+                    <span>Made with <i class="fas fa-heart text-danger"></i> for photographers</span>
+                </div>
+            </div>
         </div>
     </footer>
-
-    <?php include 'includes/footer.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const rentalDate = document.getElementById('rental_date');
-            const returnDate = document.getElementById('return_date');
-            const daysSpan = document.getElementById('days');
-            const totalPriceSpan = document.getElementById('totalPrice');
-            const pricePerDay = <?php echo $lens['price_per_day']; ?>;
-
-            function calculatePrice() {
-                if (rentalDate.value && returnDate.value) {
-                    const start = new Date(rentalDate.value);
-                    const end = new Date(returnDate.value);
-                    const diffTime = Math.abs(end - start);
-                    const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-                    
-                    daysSpan.textContent = diffDays;
-                    totalPriceSpan.textContent = (diffDays * pricePerDay).toLocaleString('id-ID');
-                    
-                    // Update return date minimum
-                    const minReturn = new Date(start);
-                    minReturn.setDate(minReturn.getDate() + 1);
-                    returnDate.min = minReturn.toISOString().split('T')[0];
-                }
-            }
-
-            rentalDate.addEventListener('change', calculatePrice);
-            returnDate.addEventListener('change', calculatePrice);
-        });
-
-        // Dark mode toggle
-        const themeToggle = document.getElementById('themeToggle');
-        const html = document.documentElement;
-        function setTheme(theme) {
-            html.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-            themeToggle.innerHTML = theme === 'dark' ? '<i class="fa fa-sun"></i>' : '<i class="fa fa-moon"></i>';
+    // Dark mode toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    
+    function setTheme(theme) {
+        html.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        themeToggle.innerHTML = theme === 'dark' ? '<i class="fa fa-sun"></i>' : '<i class="fa fa-moon"></i>';
+    }
+    
+    themeToggle.addEventListener('click', function() {
+        const current = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        setTheme(current);
+    });
+    
+    (function() {
+        const saved = localStorage.getItem('theme');
+        if (saved) {
+            setTheme(saved);
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            setTheme('dark');
+        } else {
+            setTheme('light');
         }
-        themeToggle.addEventListener('click', function() {
-            const current = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            setTheme(current);
+    })();
+
+    // Price calculation
+    const rentalDate = document.getElementById('rental_date');
+    const returnDate = document.getElementById('return_date');
+    const calculation = document.getElementById('calculation');
+    const pricePerDay = <?php echo $lens['price_per_day']; ?>;
+
+    function calculatePrice() {
+        const rental = new Date(rentalDate.value);
+        const return_d = new Date(returnDate.value);
+        
+        if (rentalDate.value && returnDate.value && return_d > rental) {
+            const days = Math.ceil((return_d - rental) / (1000 * 60 * 60 * 24));
+            const total = days * pricePerDay;
+            
+            calculation.innerHTML = `
+                <div class="row">
+                    <div class="col-6">
+                        <small>Durasi:</small><br>
+                        <strong>${days} hari</strong>
+                    </div>
+                    <div class="col-6">
+                        <small>Total:</small><br>
+                        <strong class="price-display">${total.toLocaleString('id-ID')}</strong>
+                    </div>
+                </div>
+            `;
+        } else {
+            calculation.innerHTML = 'Pilih tanggal untuk melihat perhitungan';
+        }
+    }
+
+    rentalDate.addEventListener('change', calculatePrice);
+    returnDate.addEventListener('change', calculatePrice);
+
+    // Form validation
+    const form = document.getElementById('rentalForm');
+    form.addEventListener('submit', function(e) {
+        const rental = new Date(rentalDate.value);
+        const return_d = new Date(returnDate.value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (rental < today) {
+            e.preventDefault();
+            alert('Tanggal sewa tidak boleh di masa lalu!');
+            return;
+        }
+
+        if (return_d <= rental) {
+            e.preventDefault();
+            alert('Tanggal kembali harus setelah tanggal sewa!');
+            return;
+        }
+    });
+
+    // Add form focus effects
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'scale(1.02)';
+            this.parentElement.style.transition = 'transform 0.3s ease';
         });
-        (function() {
-            const saved = localStorage.getItem('theme');
-            if (saved) {
-                setTheme(saved);
-            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                setTheme('dark');
-            } else {
-                setTheme('light');
-            }
-        })();
+        
+        input.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+    });
     </script>
 </body>
 </html>

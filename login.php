@@ -68,197 +68,112 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Login - Lens Rental System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="includes/vintage-theme.css">
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2922/2922017.png">
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1e40af;
-            --accent: #38bdf8;
-            --bg: #f8fafc;
-            --card-bg: #fff;
-            --text: #222;
-            --border: #e5e7eb;
-            --shadow: 0 2px 16px rgba(0,0,0,0.06);
-        }
-        [data-theme="dark"] {
-            --primary: #60a5fa;
-            --primary-dark: #2563eb;
-            --accent: #38bdf8;
-            --bg: #181a20;
-            --card-bg: #23262f;
-            --text: #f3f4f6;
-            --border: #2d2f36;
-            --shadow: 0 2px 16px rgba(0,0,0,0.18);
-        }
-        html, body {
-            font-family: 'Inter', Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-        }
-        .navbar {
-            position: sticky;
-            top: 0;
-            z-index: 1030;
-            background: var(--primary-dark) !important;
-            box-shadow: var(--shadow);
-        }
-        .navbar .nav-link {
-            color: #fff !important;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-        .navbar .nav-link:hover {
-            color: var(--accent) !important;
-        }
-        .theme-toggle {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 1.3em;
-            margin-left: 1rem;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .theme-toggle:hover {
-            color: var(--accent);
-        }
-        .login-container {
-            max-width: 400px;
-            margin: 100px auto;
-        }
-        .card {
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            background: var(--card-bg);
-        }
-        .card-header {
-            background: var(--card-bg);
-            border-bottom: none;
-            text-align: center;
-            padding: 20px;
-        }
-        .form-control {
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--bg);
-            color: var(--text);
-        }
-        .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px var(--accent);
-        }
-        .btn-primary {
-            background: var(--primary);
-            border-color: var(--primary-dark);
-        }
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            border-color: var(--primary);
-        }
-        .alert {
-            border-radius: 8px;
-        }
-        @media (max-width: 576px) {
-            .card {
-                border-radius: 10px;
-            }
-        }
-        .footer {
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background: var(--card-bg);
-            color: var(--text);
-            text-align: center;
-            padding: 16px 0 8px 0;
-            border-top: 1px solid var(--border);
-            box-shadow: var(--shadow);
-        }
-        body {
-            padding-bottom: 60px; /* Height of footer */
-        }
-        @media (max-width: 576px) {
-            .footer {
-                padding: 10px 0 6px 0;
-            }
-        }
-    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="index.php">LensRental</a>
+            <a class="navbar-brand" href="index.php">
+                <i class="fas fa-camera-retro me-2"></i>LensRental
+            </a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="login.php">Login</a>
-                <a class="nav-link" href="register.php">Register</a>
-                <button class="theme-toggle" id="themeToggle" title="Toggle dark mode"><i class="fa fa-moon"></i></button>
+                <a class="nav-link" href="login.php">
+                    <i class="fas fa-sign-in-alt me-1"></i>Login
+                </a>
+                <a class="nav-link" href="register.php">
+                    <i class="fas fa-user-plus me-1"></i>Register
+                </a>
+                <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">
+                    <i class="fa fa-moon"></i>
+                </button>
             </div>
         </div>
     </nav>
+
     <div class="container">
-        <div class="login-container">
-            <div class="card">
+        <div class="login-container fade-in">
+            <div class="card auth-card">
                 <div class="card-header">
-                    <h4 class="mb-0">Login</h4>
+                    <h3>
+                        <i class="fas fa-sign-in-alt me-3"></i>Login
+                    </h3>
+                    <p class="text-muted mb-0">Masuk ke akun Anda</p>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     <?php if ($error): ?>
-                        <div class="alert alert-danger" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <?php echo htmlspecialchars($error); ?>
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i><?php echo htmlspecialchars($error); ?>
                         </div>
                     <?php endif; ?>
                     
                     <form method="POST" action="">
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope me-2"></i>Email Address
+                            </label>
                             <input type="email" class="form-control" id="email" name="email" 
                                    value="<?php echo htmlspecialchars($email); ?>" required>
                         </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
+                        
+                        <div class="mb-4">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock me-2"></i>Password
+                            </label>
                             <input type="password" class="form-control" id="password" name="password" required>
                         </div>
+                        
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
                             </button>
                         </div>
                     </form>
                     
-                    <div class="text-center mt-3">
-                        <p class="mb-0">Don't have an account? <a href="register.php">Register here</a></p>
+                    <div class="text-center mt-4">
+                        <p class="mb-0">
+                            Belum punya akun? 
+                            <a href="register.php" class="text-decoration-none">
+                                <i class="fas fa-user-plus me-1"></i>Register di sini
+                            </a>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <footer class="footer mt-auto">
         <div class="container">
-            <span>&copy; <?php echo date('Y'); ?> LensRental. All rights reserved.</span>
+            <div class="row">
+                <div class="col-md-6">
+                    <span>&copy; <?php echo date('Y'); ?> LensRental. All rights reserved.</span>
+                </div>
+                <div class="col-md-6 text-end">
+                    <span>Made with <i class="fas fa-heart text-danger"></i> for photographers</span>
+                </div>
+            </div>
         </div>
     </footer>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script>
     // Dark mode toggle
     const themeToggle = document.getElementById('themeToggle');
     const html = document.documentElement;
+    
     function setTheme(theme) {
         html.setAttribute('data-theme', theme);
         localStorage.setItem('theme', theme);
         themeToggle.innerHTML = theme === 'dark' ? '<i class="fa fa-sun"></i>' : '<i class="fa fa-moon"></i>';
     }
+    
     themeToggle.addEventListener('click', function() {
         const current = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         setTheme(current);
     });
+    
     (function() {
         const saved = localStorage.getItem('theme');
         if (saved) {
@@ -269,6 +184,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             setTheme('light');
         }
     })();
+
+    // Add form focus effects
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'scale(1.02)';
+            this.parentElement.style.transition = 'transform 0.3s ease';
+        });
+        
+        input.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+    });
     </script>
 </body>
 </html>

@@ -51,201 +51,135 @@ $csrf_token = generateCSRFToken();
     <title>Register - Lens Rental</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="includes/vintage-theme.css">
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2922/2922017.png">
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1e40af;
-            --accent: #38bdf8;
-            --bg: #f8fafc;
-            --card-bg: #fff;
-            --text: #222;
-            --border: #e5e7eb;
-            --shadow: 0 2px 16px rgba(0,0,0,0.06);
-        }
-        [data-theme="dark"] {
-            --primary: #60a5fa;
-            --primary-dark: #2563eb;
-            --accent: #38bdf8;
-            --bg: #181a20;
-            --card-bg: #23262f;
-            --text: #f3f4f6;
-            --border: #2d2f36;
-            --shadow: 0 2px 16px rgba(0,0,0,0.18);
-        }
-        html, body {
-            font-family: 'Inter', Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-        }
-        .navbar {
-            position: sticky;
-            top: 0;
-            z-index: 1030;
-            background: var(--primary-dark) !important;
-            box-shadow: var(--shadow);
-        }
-        .navbar .nav-link {
-            color: #fff !important;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-        .navbar .nav-link:hover {
-            color: var(--accent) !important;
-        }
-        .theme-toggle {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 1.3em;
-            margin-left: 1rem;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .theme-toggle:hover {
-            color: var(--accent);
-        }
-        .card {
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            background: var(--card-bg);
-        }
-        .card-header {
-            background: var(--card-bg);
-            border-bottom: none;
-            text-align: center;
-            padding: 20px;
-        }
-        .form-control {
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--bg);
-            color: var(--text);
-        }
-        .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px var(--accent);
-        }
-        .btn-primary {
-            background: var(--primary);
-            border-color: var(--primary-dark);
-        }
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            border-color: var(--primary);
-        }
-        .alert {
-            border-radius: 8px;
-        }
-        @media (max-width: 576px) {
-            .card {
-                border-radius: 10px;
-            }
-        }
-        .footer {
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background: var(--card-bg);
-            color: var(--text);
-            text-align: center;
-            padding: 16px 0 8px 0;
-            border-top: 1px solid var(--border);
-            box-shadow: var(--shadow);
-        }
-        body {
-            padding-bottom: 60px; /* Height of footer */
-        }
-        @media (max-width: 576px) {
-            .footer {
-                padding: 10px 0 6px 0;
-            }
-        }
-    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="index.php">LensRental</a>
+            <a class="navbar-brand" href="index.php">
+                <i class="fas fa-camera-retro me-2"></i>LensRental
+            </a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="login.php">Login</a>
-                <a class="nav-link" href="register.php">Register</a>
-                <button class="theme-toggle" id="themeToggle" title="Toggle dark mode"><i class="fa fa-moon"></i></button>
+                <a class="nav-link" href="login.php">
+                    <i class="fas fa-sign-in-alt me-1"></i>Login
+                </a>
+                <a class="nav-link" href="register.php">
+                    <i class="fas fa-user-plus me-1"></i>Register
+                </a>
+                <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">
+                    <i class="fa fa-moon"></i>
+                </button>
             </div>
         </div>
     </nav>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="text-center">Register</h3>
-                    </div>
-                    <div class="card-body">
-                        <?php if ($error_message): ?>
-                            <div class="alert alert-danger"><?php echo htmlspecialchars($error_message); ?></div>
-                        <?php endif; ?>
-                        
-                        <?php if ($success_message): ?>
-                            <div class="alert alert-success"><?php echo htmlspecialchars($success_message); ?></div>
-                        <?php endif; ?>
 
-                        <form method="POST" action="">
-                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Nama</label>
-                                <input type="text" class="form-control" id="name" name="name" required minlength="2">
-                                <div class="form-text">Minimal 2 karakter</div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" required minlength="8">
-                                <div class="form-text">Minimal 8 karakter, harus mengandung angka dan huruf</div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="confirm_password" class="form-label">Konfirmasi Password</label>
-                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required minlength="8">
-                            </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">Register</button>
-                            </div>
-                        </form>
-                        <div class="text-center mt-3">
-                            <p>Sudah punya akun? <a href="login.php">Login di sini</a></p>
+    <div class="container">
+        <div class="register-container fade-in">
+            <div class="card auth-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-user-plus me-3"></i>Register
+                    </h3>
+                    <p class="text-muted mb-0">Buat akun baru Anda</p>
+                </div>
+                <div class="card-body p-4">
+                    <?php if ($error_message): ?>
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i><?php echo htmlspecialchars($error_message); ?>
                         </div>
+                    <?php endif; ?>
+                    
+                    <?php if ($success_message): ?>
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i><?php echo htmlspecialchars($success_message); ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <form method="POST" action="">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label">
+                                <i class="fas fa-user me-2"></i>Nama Lengkap
+                            </label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope me-2"></i>Email Address
+                            </label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock me-2"></i>Password
+                            </label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="confirm_password" class="form-label">
+                                <i class="fas fa-lock me-2"></i>Konfirmasi Password
+                            </label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>Register
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <p class="mb-0">
+                            Sudah punya akun? 
+                            <a href="login.php" class="text-decoration-none">
+                                <i class="fas fa-sign-in-alt me-1"></i>Login di sini
+                            </a>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
     <footer class="footer mt-auto">
         <div class="container">
-            <span>&copy; <?php echo date('Y'); ?> LensRental. All rights reserved.</span>
+            <div class="row">
+                <div class="col-md-6">
+                    <span>&copy; <?php echo date('Y'); ?> LensRental. All rights reserved.</span>
+                </div>
+                <div class="col-md-6 text-end">
+                    <span>Made with <i class="fas fa-heart text-danger"></i> for photographers</span>
+                </div>
+            </div>
         </div>
     </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script>
     // Dark mode toggle
     const themeToggle = document.getElementById('themeToggle');
     const html = document.documentElement;
+    
     function setTheme(theme) {
         html.setAttribute('data-theme', theme);
         localStorage.setItem('theme', theme);
         themeToggle.innerHTML = theme === 'dark' ? '<i class="fa fa-sun"></i>' : '<i class="fa fa-moon"></i>';
     }
+    
     themeToggle.addEventListener('click', function() {
         const current = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         setTheme(current);
     });
+    
     (function() {
         const saved = localStorage.getItem('theme');
         if (saved) {
@@ -256,6 +190,33 @@ $csrf_token = generateCSRFToken();
             setTheme('light');
         }
     })();
+
+    // Add form focus effects
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'scale(1.02)';
+            this.parentElement.style.transition = 'transform 0.3s ease';
+        });
+        
+        input.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+    });
+
+    // Password confirmation validation
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirm_password');
+    
+    function validatePassword() {
+        if (password.value !== confirmPassword.value) {
+            confirmPassword.setCustomValidity('Password tidak cocok!');
+        } else {
+            confirmPassword.setCustomValidity('');
+        }
+    }
+    
+    password.addEventListener('change', validatePassword);
+    confirmPassword.addEventListener('keyup', validatePassword);
     </script>
 </body>
 </html>
